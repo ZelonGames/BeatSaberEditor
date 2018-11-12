@@ -9,6 +9,11 @@ public class MapCreator : MonoBehaviour
     public MapInfo _MapInfo { get; private set; }
     public Map _Map { get; private set; }
 
+    private void Awake()
+    {
+        Input.simulateMouseWithTouches = true;
+    }
+
     public void Create()
     {
         CreateMap("Apa", "Gris", "Gorilla", 120, 12, 12, "cover.jpg", "niceEnvironment", false, new List<DifficultyLevel> { new DifficultyLevel("Expert", 1, "song.ogg", "Expert.json", 0, 0), new DifficultyLevel("Expert", 1, "song.ogg", "Expert.json", 0, 0), });
@@ -26,5 +31,13 @@ public class MapCreator : MonoBehaviour
 
         string jsonData = JsonConvert.SerializeObject(_MapInfo);
         string mapJson = JsonConvert.SerializeObject(_Map);
+    }
+
+    private void Update()
+    {
+        if (Input.touchCount > 0)
+        {
+
+        }
     }
 }
