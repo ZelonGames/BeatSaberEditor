@@ -19,17 +19,23 @@ public class GridGenerator : MonoBehaviour
         var canvasRect = canvas.GetComponent<RectTransform>().rect;
         var tileRect = tilePrefab.GetComponent<RectTransform>().rect;
 
-        int amount = 4;
+        int width = 4;
+        int height = 3;
 
-        float totalWidth = tileRect.width * amount + distance * (amount - 1);
+        float totalWidth = tileRect.width * width + distance * (width - 1);
         float distanceFromCenter = (canvasRect.width - totalWidth) * 0.5f;
 
-        for (int i = 0; i < amount; i++)
+        for (int x = 0; x < width; x++)
         {
-            var newTile = Instantiate(tilePrefab);
-            newTile.gameObject.transform.SetParent(gameObject.transform, false);
-            newTile.transform.position = new Vector2(tileRect.width * 0.5f + tileRect.width * i + distance * i + distanceFromCenter, canvasRect.height - tileRect.height * 0.5f - 100);
-            tiles.Add(newTile);
+            for (int y = 0; y < height; y++)
+            {
+                var newTile = Instantiate(tilePrefab);
+                newTile.gameObject.transform.SetParent(gameObject.transform, false);
+                newTile.transform.position = new Vector3(
+                    tileRect.width * 0.5f + tileRect.width * x + distance * x + distanceFromCenter, 
+                    canvasRect.height - tileRect.height * 0.5f - 100 - tileRect.height * y - distance * y, x);
+                tiles.Add(newTile);
+            }
         }
     }
 

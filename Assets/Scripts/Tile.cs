@@ -18,7 +18,7 @@ public class Tile : MonoBehaviour
         int angle = 0;
         for (int i = 0; i < 8; i++)
         {
-            InstantiateCutDirection(PointOnCircle(120, angle, gameObject.transform.position), angle - 90);
+            InstantiateCutDirection(PointOnCircle(120, angle, gameObject.transform.position), angle - 90, 4 + i);
             angle += 45;
         }
 
@@ -39,11 +39,11 @@ public class Tile : MonoBehaviour
         isPressed = false;
     }
 
-    private void InstantiateCutDirection(Vector2 position, float rotation)
+    private void InstantiateCutDirection(Vector2 position, float rotation, int renderOrder)
     {
         var cutDirection = Instantiate(cutDirectionPrefab);
-        cutDirection.transform.SetParent(gameObject.transform, false);
-        cutDirection.transform.position = position;
+        cutDirection.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform, false);
+        cutDirection.transform.position = new Vector3(position.x, position.y, renderOrder);
         cutDirection.transform.Rotate(new Vector3(0, 0, 1), rotation);
     }
 
