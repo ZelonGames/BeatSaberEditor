@@ -34,6 +34,7 @@ public class GridGenerator : MonoBehaviour
                 newTile.transform.position = new Vector3(
                     tileRect.width * 0.5f + tileRect.width * x + distance * x + distanceFromCenter, 
                     canvasRect.height - tileRect.height * 0.5f - 100 - tileRect.height * y - distance * y, x);
+                newTile.SetCoordinate(new Vector2(x, y));
                 tiles.Add(newTile);
             }
         }

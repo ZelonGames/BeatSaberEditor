@@ -41,7 +41,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 875aa91dbfc87d74bb1b34fb196e159e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cutDirectionPrefab: {fileID: 1778463711759112, guid: baa0e939efe45c84cbdad7fe70801c7b,
+  cutDirectionPrefab: {fileID: 114388688306176016, guid: 56594ac49b603ed45a90e12496b55b07,
     type: 2}
 --- !u!114 &114404621908053604
 MonoBehaviour:
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

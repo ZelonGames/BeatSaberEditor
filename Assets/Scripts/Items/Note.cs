@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
+using UnityEngine.UI;
 
-public class Note
+public class Note : MonoBehaviour
 {
     public enum CutDirection
     {
@@ -24,18 +26,36 @@ public class Note
         Blue = 1,
     }
 
+    [HideInInspector]
     public double _time;
+    [HideInInspector]
     public int _lineIndex;
+    [HideInInspector]
     public int _lineLayer;
+    [HideInInspector]
     public int _type;
+    [HideInInspector]
     public int _cutDirection;
 
-    public Note(double _time, int _lineIndex, int _lineLayer, ColorType _type, CutDirection _cutDirection)
+    public void Set(double _time, int _lineIndex, int _lineLayer, ColorType _type, CutDirection _cutDirection)
     {
         this._time = _time;
         this._lineIndex = _lineIndex;
         this._lineLayer = _lineLayer;
         this._type = (int)_type;
         this._cutDirection = (int)_cutDirection;
+
+        var image = gameObject.GetComponent<Image>();
+        switch (_type)
+        {
+            case ColorType.Red:
+                image.color = Color.red;
+                break;
+            case ColorType.Blue:
+                image.color = Color.blue;
+                break;
+            default:
+                break;
+        }
     }
 }
