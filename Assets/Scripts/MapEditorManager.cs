@@ -6,8 +6,17 @@ using TMPro;
 
 public class MapEditorManager : MonoBehaviour
 {
+    #region Fields
+
     [SerializeField]
     private TextMeshProUGUI txtPrecision;
+
+    public bool playing = false;
+    private float timer = 0;
+
+    #endregion
+
+    #region Properties
 
     public Note.ColorType CurrentColor { get; private set; }
     public int Precision { get; private set; }
@@ -15,12 +24,44 @@ public class MapEditorManager : MonoBehaviour
 
     public static MapEditorManager Instance { get; private set; }
 
-    void Start()
+    #endregion
+
+    #region Events
+
+    private void Start()
     {
         CurrentTime = 1;
         Instance = this;
         CurrentColor = Note.ColorType.Blue;
         Precision = 1;
+    }
+
+    private void Update()
+    {
+        Play(120);
+    }
+
+    #endregion
+
+    #region Methods
+
+    public void Play()
+    {
+        timer = 0;
+        playing = !playing;
+    }
+
+    public void Play(int bpm)
+    {
+        if (!playing)
+            return;
+
+        timer += Time.deltaTime;
+        if (timer >= GetBPMInSeconds(120) / Precision)
+        {
+            ChangeTime(true);
+            timer = 0;
+        }
     }
 
     public void IncreasePrecision()
@@ -77,4 +118,11 @@ public class MapEditorManager : MonoBehaviour
     {
         txtPrecision.text = "Precision: 1/" + Precision;
     }
+
+    private float GetBPMInSeconds(int bpm)
+    {
+        return 60f / bpm;
+    }
+
+    #endregion
 }

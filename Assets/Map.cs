@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 
 public class Map
 {
+    #region Fields
+
     public List<Note> _notes = new List<Note>();
 
     public string _version;
@@ -16,9 +18,17 @@ public class Map
     public int _shuffle;
     public double _shufflePeriod = 0.5;
 
+    #endregion
+
+    #region Properties
+
     [JsonIgnore]
     public Dictionary<double, List<Note>> NoteTimeChunks { get; private set; }
 
+    #endregion
+
+    #region Constructors
+    
     public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<Note> _notes)
     {
         NoteTimeChunks = new Dictionary<double, List<Note>>();
@@ -27,6 +37,10 @@ public class Map
         this._noteJumpSpeed = _noteJumpSpeed;
         this._notes = _notes;
     }
+
+    #endregion
+
+    #region Methods
 
     public void AddNote(Note notePrefab, CutDirection cutDirection, Tile tile, double _time, Note.ColorType color)
     {
@@ -76,4 +90,11 @@ public class Map
 
         return null;
     }
+
+    public Note GetNextNote(double currentTime)
+    {
+        return null;
+    }
+
+    #endregion
 }
