@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 
 public class Map
 {
-    [JsonIgnore]
-    public Dictionary<double, List<Note>> noteTimeChunks = new Dictionary<double, List<Note>>();
     public List<Note> _notes = new List<Note>();
 
     public string _version;
@@ -18,8 +16,12 @@ public class Map
     public int _shuffle;
     public double _shufflePeriod = 0.5;
 
+    [JsonIgnore]
+    public Dictionary<double, List<Note>> NoteTimeChunks { get; private set; }
+
     public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<Note> _notes)
     {
+        NoteTimeChunks = new Dictionary<double, List<Note>>();
         this._version = _version;
         this._beatsPerMinute = _beatsPerMinute;
         this._noteJumpSpeed = _noteJumpSpeed;
@@ -28,20 +30,30 @@ public class Map
 
     public void AddNote(Note notePrefab, CutDirection cutDirection, Tile tile, double _time, Note.ColorType color)
     {
-        if (!noteTimeChunks.ContainsKey(_time))
-            noteTimeChunks.Add(_time, new List<Note>());
+        if (!NoteTimeChunks.ContainsKey(_time))
+            NoteTimeChunks.Add(_time, new List<Note>());
 
         var note = GameObject.Instantiate(notePrefab);
         note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
-        note.gameObject.transform.Rotate(new Vector3(0, 0, 1), cutDirection.GetAngle(cutDirection._CutDirection).Value);
+        note.gameObject.transform.Rotate(Vector3.forward, cutDirection.GetAngle(cutDirection._CutDirection).Value);
         note.gameObject.transform.position = tile.gameObject.transform.position;
         note.Set(GetBeatTime(_beatsPerMinute, 0, _time), 0, 0, color, cutDirection._CutDirection);
 
-        noteTimeChunks[_time].Add(note);
+        NoteTimeChunks[_time].Add(note);
         _notes.Add(note);
         var btnCutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
         foreach (var btnCutDirection in btnCutDirections)
             GameObject.Destroy(btnCutDirection);
+    }
+
+    public void RemoveNote(Note note)
+    {
+        _notes.Remove(note);
+        NoteTimeChunks[note._time].Remove(note);
+        if (NoteTimeChunks[note._time].Count == 0)
+            NoteTimeChunks.Remove(note._time);
+
+        GameObject.Destroy(note.gameObject);
     }
 
     public double GetBeatTime(double bpm, double ms, double _time)
@@ -56,7 +68,7 @@ public class Map
 
     public Note GetNote(double time, int cutDirection)
     {
-        foreach(var note in noteTimeChunks[time])
+        foreach(var note in NoteTimeChunks[time])
         {
             if (note._cutDirection == cutDirection)
                 return note;

@@ -58,4 +58,9 @@ public class Note : MonoBehaviour
                 break;
         }
     }
+
+    public void Remove()
+    {
+        MapCreator._Map.RemoveNote(this);
+    }
 }

@@ -45,10 +45,10 @@ public class MapEditorManager : MonoBehaviour
 
     public void ShowHideNotes(bool show)
     {
-        if (!MapCreator._Map.noteTimeChunks.ContainsKey(CurrentTime))
+        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(CurrentTime))
             return;
 
-        foreach(var note in MapCreator._Map.noteTimeChunks[CurrentTime])
+        foreach(var note in MapCreator._Map.NoteTimeChunks[CurrentTime])
         {
             note.gameObject.SetActive(show);
         }
