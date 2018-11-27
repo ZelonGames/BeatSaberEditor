@@ -1,9 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class MapEditorManager : MonoBehaviour
 {
+    [SerializeField]
+    private TextMeshProUGUI txtPrecision;
+
     public Note.ColorType CurrentColor { get; private set; }
     public int Precision { get; private set; }
     public float CurrentTime { get; private set; }
@@ -16,6 +21,20 @@ public class MapEditorManager : MonoBehaviour
         Instance = this;
         CurrentColor = Note.ColorType.Blue;
         Precision = 1;
+    }
+
+    public void IncreasePrecision()
+    {
+        if (Precision < 64)
+            Precision++;
+        UpdatePrecisionText();
+    }
+
+    public void DecreasePrecision()
+    {
+        if (Precision > 1)
+            Precision--;
+        UpdatePrecisionText();
     }
 
     public void ChangeTime(bool forward)
@@ -48,9 +67,14 @@ public class MapEditorManager : MonoBehaviour
         if (!MapCreator._Map.NoteTimeChunks.ContainsKey(CurrentTime))
             return;
 
-        foreach(var note in MapCreator._Map.NoteTimeChunks[CurrentTime])
+        foreach (var note in MapCreator._Map.NoteTimeChunks[CurrentTime])
         {
             note.gameObject.SetActive(show);
         }
+    }
+
+    private void UpdatePrecisionText()
+    {
+        txtPrecision.text = "Precision: 1/" + Precision;
     }
 }
