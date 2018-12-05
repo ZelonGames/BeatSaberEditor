@@ -14,13 +14,10 @@ public class MusicPlayer : MonoBehaviour
         audioSource.clip = music;
     }
 
-    private void Update()
-    {
-
-    }
-
     public void ToggleSong()
     {
+        audioSource.time = MapEditorManager.Instance.CurrentTimeInSeconds;
+        
         if (MapEditorManager.Instance.Playing)
             audioSource.Play(); 
         else

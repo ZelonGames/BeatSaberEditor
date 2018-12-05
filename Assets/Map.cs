@@ -25,10 +25,18 @@ public class Map
     [JsonIgnore]
     public Dictionary<double, List<Note>> NoteTimeChunks { get; private set; }
 
+    public float BeatLenghtInSeconds
+    {
+        get
+        {
+            return 60f / _beatsPerMinute;
+        }
+    }
+
     #endregion
 
     #region Constructors
-    
+
     public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<Note> _notes)
     {
         NoteTimeChunks = new Dictionary<double, List<Note>>();

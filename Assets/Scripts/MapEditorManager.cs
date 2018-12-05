@@ -25,6 +25,14 @@ public class MapEditorManager : MonoBehaviour
     public float CurrentTime { get; private set; }
     public bool Playing { get; private set; }
 
+    public float CurrentTimeInSeconds
+    {
+        get
+        {
+            return MapCreator._Map.BeatLenghtInSeconds * CurrentTime;
+        }
+    }
+
     public static MapEditorManager Instance { get; private set; }
 
     #endregion
@@ -38,9 +46,9 @@ public class MapEditorManager : MonoBehaviour
         Precision = 1;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        Play(120);
+        Play(MapCreator._Map._beatsPerMinute);
     }
 
     #endregion
