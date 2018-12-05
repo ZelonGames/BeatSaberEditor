@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,9 +11,10 @@ public class MapEditorManager : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI txtPrecision;
+    [SerializeField]
+    private TextMeshProUGUI txtBeatTime;
 
-    public bool playing = false;
-    private float timer = 0;
+    private double timer = 0;
 
     #endregion
 
@@ -21,6 +23,7 @@ public class MapEditorManager : MonoBehaviour
     public Note.ColorType CurrentColor { get; private set; }
     public int Precision { get; private set; }
     public float CurrentTime { get; private set; }
+    public bool Playing { get; private set; }
 
     public static MapEditorManager Instance { get; private set; }
 
@@ -30,7 +33,6 @@ public class MapEditorManager : MonoBehaviour
 
     private void Start()
     {
-        CurrentTime = 1;
         Instance = this;
         CurrentColor = Note.ColorType.Blue;
         Precision = 1;
@@ -48,16 +50,16 @@ public class MapEditorManager : MonoBehaviour
     public void Play()
     {
         timer = 0;
-        playing = !playing;
+        Playing = !Playing;
     }
 
     public void Play(int bpm)
     {
-        if (!playing)
+        if (!Playing)
             return;
 
         timer += Time.deltaTime;
-        if (timer >= GetBPMInSeconds(120) / Precision)
+        if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / Precision)
         {
             ChangeTime(true);
             timer = 0;
@@ -86,6 +88,8 @@ public class MapEditorManager : MonoBehaviour
             CurrentTime += 1f / Precision;
         else
             CurrentTime -= 1f / Precision;
+
+        UpdateBeatTimeText();
 
         ShowHideNotes(true);
     }
@@ -119,9 +123,14 @@ public class MapEditorManager : MonoBehaviour
         txtPrecision.text = "Precision: 1/" + Precision;
     }
 
-    private float GetBPMInSeconds(int bpm)
+    private void UpdateBeatTimeText()
     {
-        return 60f / bpm;
+        txtBeatTime.text = "Beat: " + Math.Round(CurrentTime, 2);
+    }
+
+    private double GetBPMInSeconds(int bpm)
+    {
+        return 60d / bpm;
     }
 
     #endregion
