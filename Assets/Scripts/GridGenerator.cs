@@ -32,7 +32,7 @@ public class GridGenerator : MonoBehaviour
                 var newTile = Instantiate(tilePrefab);
                 newTile.gameObject.transform.SetParent(gameObject.transform, false);
                 newTile.transform.position = new Vector3(
-                    tileRect.width * 0.5f + tileRect.width * x + distance * x + distanceFromCenter, 
+                    tileRect.width * 0.5f + tileRect.width * x + distance * x + 150, 
                     canvasRect.height - tileRect.height * 0.5f - 100 - tileRect.height * y - distance * y, x);
                 newTile.SetCoordinate(new Vector2(x, y));
                 tiles.Add(newTile);

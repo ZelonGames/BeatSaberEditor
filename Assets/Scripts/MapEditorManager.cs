@@ -48,7 +48,8 @@ public class MapEditorManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Play(MapCreator._Map._beatsPerMinute);
+        if (Playing)
+            Play(MapCreator._Map._beatsPerMinute);
     }
 
     #endregion
@@ -63,9 +64,6 @@ public class MapEditorManager : MonoBehaviour
 
     public void Play(int bpm)
     {
-        if (!Playing)
-            return;
-
         timer += Time.deltaTime;
         if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / Precision)
         {
