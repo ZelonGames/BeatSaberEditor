@@ -33,6 +33,11 @@ public class Map
         }
     }
 
+    public double AmountOfBeatsInSong()
+    {
+        return MusicPlayer.Instance.MusicLengthInSeconds / BeatLenghtInSeconds;
+    }
+
     #endregion
 
     #region Constructors
@@ -50,7 +55,7 @@ public class Map
 
     #region Methods
 
-    public void AddNote(Note notePrefab, CutDirection cutDirection, Tile tile, double _time, Note.ColorType color)
+    public Note AddNote(Note notePrefab, CutDirection cutDirection, Tile tile, double _time, Note.ColorType color)
     {
         if (!NoteTimeChunks.ContainsKey(_time))
             NoteTimeChunks.Add(_time, new List<Note>());
@@ -59,13 +64,15 @@ public class Map
         note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
         note.gameObject.transform.Rotate(Vector3.forward, cutDirection.GetAngle(cutDirection._CutDirection).Value);
         note.gameObject.transform.position = tile.gameObject.transform.position;
-        note.Set(GetBeatTime(_beatsPerMinute, 0, _time), 0, 0, color, cutDirection._CutDirection);
-
+        note.Set(GetBeatTime(_beatsPerMinute, 0, _time), tile.Coordinate.x, tile.Coordinate.y, color, cutDirection._CutDirection);
+        
         NoteTimeChunks[_time].Add(note);
         _notes.Add(note);
         var btnCutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
         foreach (var btnCutDirection in btnCutDirections)
             GameObject.Destroy(btnCutDirection);
+
+        return note;
     }
 
     public void RemoveNote(Note note)
@@ -75,6 +82,7 @@ public class Map
         if (NoteTimeChunks[note._time].Count == 0)
             NoteTimeChunks.Remove(note._time);
 
+        GameObject.Destroy(note.arrowCube);
         GameObject.Destroy(note.gameObject);
     }
 
@@ -90,7 +98,7 @@ public class Map
 
     public Note GetNote(double time, int cutDirection)
     {
-        foreach(var note in NoteTimeChunks[time])
+        foreach (var note in NoteTimeChunks[time])
         {
             if (note._cutDirection == cutDirection)
                 return note;

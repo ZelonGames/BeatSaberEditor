@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json;
 
 public class Note : MonoBehaviour
 {
+    [JsonIgnore]
+    public GameObject arrowCube = null;
+
     public enum CutDirection
     {
         Up = 0,

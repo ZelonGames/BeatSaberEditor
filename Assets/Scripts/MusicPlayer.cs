@@ -9,6 +9,21 @@ public class MusicPlayer : MonoBehaviour
     [SerializeField]
     private AudioSource audioSource;
 
+    public float MusicLengthInSeconds
+    {
+        get
+        {
+            return music.length;
+        }
+    }
+
+    public static MusicPlayer Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
         audioSource.clip = music;

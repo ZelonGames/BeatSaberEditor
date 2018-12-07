@@ -9,14 +9,14 @@ public class Tile : MonoBehaviour
     private bool isPressed = false;
     private bool hasSetCoordinate = false;
 
-    public Vector2 Coordinate { get; private set; }
+    public Vector2Int Coordinate { get; private set; }
 
     private void Start()
     {
 
     }
 
-    public void SetCoordinate(Vector2 coordinate)
+    public void SetCoordinate(Vector2Int coordinate)
     {
         if (hasSetCoordinate)
             return;

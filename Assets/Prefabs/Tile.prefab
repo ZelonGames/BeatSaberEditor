@@ -41,7 +41,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 875aa91dbfc87d74bb1b34fb196e159e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cutDirectionPrefab: {fileID: 114388688306176016, guid: 56594ac49b603ed45a90e12496b55b07,
+  cutDirectionPrefab: {fileID: 114329077722247058, guid: baa0e939efe45c84cbdad7fe70801c7b,
     type: 2}
 --- !u!114 &114404621908053604
 MonoBehaviour:

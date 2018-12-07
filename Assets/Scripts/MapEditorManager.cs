@@ -44,6 +44,8 @@ public class MapEditorManager : MonoBehaviour
         Instance = this;
         CurrentColor = Note.ColorType.Blue;
         Precision = 1;
+
+        UpdateBeatTimeText();
     }
 
     private void FixedUpdate()
