@@ -31,7 +31,7 @@ public class MusicPlayer : MonoBehaviour
 
     public void ToggleSong()
     {
-        audioSource.time = MapEditorManager.Instance.CurrentTimeInSeconds;
+        audioSource.time = (float)MapEditorManager.Instance.CurrentTimeInSeconds;
         
         if (MapEditorManager.Instance.Playing)
             audioSource.Play(); 

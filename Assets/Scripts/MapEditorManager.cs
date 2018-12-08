@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class MapEditorManager : MonoBehaviour
     private TextMeshProUGUI txtBeatTime;
 
     private double timer = 0;
+    private double? playingPrecision;
 
     #endregion
 
@@ -22,10 +24,10 @@ public class MapEditorManager : MonoBehaviour
 
     public Note.ColorType CurrentColor { get; private set; }
     public int Precision { get; private set; }
-    public float CurrentTime { get; private set; }
+    public double CurrentTime { get; private set; }
     public bool Playing { get; private set; }
 
-    public float CurrentTimeInSeconds
+    public double CurrentTimeInSeconds
     {
         get
         {
@@ -62,14 +64,20 @@ public class MapEditorManager : MonoBehaviour
     {
         timer = 0;
         Playing = !Playing;
+        if (!Playing)
+            playingPrecision = null;
     }
 
     public void Play(int bpm)
     {
         timer += Time.deltaTime;
-        if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / Precision)
+
+        if (!playingPrecision.HasValue)
+            SetPlayingPrecision();
+
+        if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / playingPrecision.Value)
         {
-            ChangeTime(true);
+            ChangeTime(true, true);
             timer = 0;
         }
     }
@@ -78,6 +86,7 @@ public class MapEditorManager : MonoBehaviour
     {
         if (Precision < 64)
             Precision++;
+
         UpdatePrecisionText();
     }
 
@@ -85,21 +94,51 @@ public class MapEditorManager : MonoBehaviour
     {
         if (Precision > 1)
             Precision--;
+
         UpdatePrecisionText();
     }
 
-    public void ChangeTime(bool forward)
+    private void SetPlayingPrecision()
+    {
+        double? nextTime = null;
+
+        if (MapCreator._Map.NoteTimeChunks.Count > 0 && MapCreator._Map.NoteTimeChunks.Count > MapCreator._Map.NoteTimeChunks.IndexOfKey(CurrentTime) + 1)
+            nextTime = MapCreator._Map.NoteTimeChunks.Values[MapCreator._Map.NoteTimeChunks.IndexOfKey(CurrentTime) + 1].FirstOrDefault()._time;
+        else
+            nextTime = null;
+
+        if (nextTime.HasValue && nextTime.Value > CurrentTime)
+            playingPrecision = 1d / (nextTime.Value - CurrentTime);
+        else
+            playingPrecision = null;
+    }
+
+    public void ChangeTime(bool forward, bool autoPlay)
     {
         ShowHideNotes(false);
 
         if (forward)
-            CurrentTime += 1f / Precision;
+            CurrentTime += autoPlay && playingPrecision.HasValue ? 1d / playingPrecision.Value : 1d / Precision;
         else
-            CurrentTime -= 1f / Precision;
+        {
+            CurrentTime -= 1d / Precision;
+            if (CurrentTime < 0)
+                CurrentTime = 0;
+        }
 
         UpdateBeatTimeText();
 
+        if (autoPlay)
+            SetPlayingPrecision();
+        else
+            playingPrecision = null;
+
         ShowHideNotes(true);
+    }
+
+    public void StepTime(bool forward)
+    {
+        ChangeTime(forward, false);
     }
 
     public void SwitchColor()

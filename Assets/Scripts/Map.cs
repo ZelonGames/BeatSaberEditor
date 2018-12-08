@@ -23,7 +23,7 @@ public class Map
     #region Properties
 
     [JsonIgnore]
-    public Dictionary<double, List<Note>> NoteTimeChunks { get; private set; }
+    public SortedList<double, List<Note>> NoteTimeChunks { get; private set; }
 
     public float BeatLenghtInSeconds
     {
@@ -44,7 +44,7 @@ public class Map
 
     public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<Note> _notes)
     {
-        NoteTimeChunks = new Dictionary<double, List<Note>>();
+        NoteTimeChunks = new SortedList<double, List<Note>>();
         this._version = _version;
         this._beatsPerMinute = _beatsPerMinute;
         this._noteJumpSpeed = _noteJumpSpeed;

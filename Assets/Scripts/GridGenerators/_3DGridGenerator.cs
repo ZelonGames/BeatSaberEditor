@@ -12,6 +12,8 @@ public class _3DGridGenerator : MonoBehaviour
     [SerializeField]
     private GameObject smallLine;
     [SerializeField]
+    private GameObject timelinePrefab;
+    [SerializeField]
     private TextMeshProUGUI txtBeatLinePrefab;
 
     private Rect _3DCanvasRect;
@@ -19,6 +21,8 @@ public class _3DGridGenerator : MonoBehaviour
 
     public readonly int startYPos = -500;
     public readonly int distance = 150;
+
+    public GameObject LastLine { get; private set; }
 
     public static _3DGridGenerator Instance { get; private set; }
 
@@ -36,9 +40,11 @@ public class _3DGridGenerator : MonoBehaviour
 
         GenerateHorizontalLines(startYPos, out lastLineYPos);
         GenerateVerticalLines(startYPos, lastLineYPos + startYPos);
+        InstantiateTimeline();
+
     }
 
-    public float GetBeatPosition(float beat)
+    public double GetBeatPosition(double beat)
     {
         return startYPos + distance * beat * 4;
     }
@@ -48,16 +54,24 @@ public class _3DGridGenerator : MonoBehaviour
         Bounds cubeBounds = cube.GetComponent<MeshFilter>().mesh.bounds;
         float cubeHeight = cubeBounds.size.y * cube.transform.localScale.y;
 
-        return new Vector2(smallLineRect.x + _3DCanvasRect.width / 4 * coordinate.x + _3DCanvasRect.width / 8, 
+        return new Vector2(smallLineRect.x + _3DCanvasRect.width / 4 * coordinate.x + _3DCanvasRect.width / 8,
             (2 - coordinate.y) * (2 - cubeHeight) - 50 * (2 - coordinate.y) - cubeHeight * 0.5f);
+    }
+
+    private void InstantiateTimeline()
+    {
+        GameObject timeline = Instantiate(timelinePrefab);
+        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(MapEditorManager.Instance.CurrentTime), 0);
+        timeline.transform.SetParent(_3DCanvas.transform, false);
     }
 
     private void GenerateHorizontalLines(int yPos, out int lastLineYPos)
     {
         int beat = 0;
+        GameObject lineType = null;
         for (int i = 0; i < MapCreator._Map.AmountOfBeatsInSong() * 4; i++)
         {
-            GameObject lineType = i % 4 == 0 ? bigLine : smallLine;
+            lineType = i % 4 == 0 ? bigLine : smallLine;
             InstantiateLine(lineType, new Vector2(0, yPos));
 
             if (lineType.Equals(bigLine))
@@ -69,6 +83,8 @@ public class _3DGridGenerator : MonoBehaviour
             yPos += distance;
         }
 
+        LastLine = lineType;
+
         lastLineYPos = yPos;
     }
 
@@ -79,9 +95,9 @@ public class _3DGridGenerator : MonoBehaviour
         {
             GameObject verticalLine;
             InstantiateVerticalLine(new Vector2(xPos, yPos), out verticalLine);
-            verticalLine.GetComponent<RectTransform>().sizeDelta = new Vector2(length * 0.5f, smallLineRect.height);
+            verticalLine.GetComponent<RectTransform>().sizeDelta = new Vector2(length, smallLineRect.height);
 
-            verticalLine.transform.position = new Vector3(verticalLine.transform.position.x, verticalLine.transform.position.y, verticalLine.transform.position.z + length * 0.25f);
+            verticalLine.transform.position = new Vector3(verticalLine.transform.position.x, verticalLine.transform.position.y, verticalLine.transform.position.z + length * 0.5f);
             xPos += _3DCanvasRect.width / 4;
         }
     }
