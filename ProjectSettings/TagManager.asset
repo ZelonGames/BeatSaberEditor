@@ -7,6 +7,8 @@ TagManager:
   - 2DGrid
   - CutDirection
   - 3DCanvas
+  - Directory
+  - File
   layers:
   - Default
   - TransparentFX

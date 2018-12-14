@@ -59,7 +59,7 @@ public class Tile : MonoBehaviour
         cutDirection.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform, false);
         cutDirection.transform.position = position;
         cutDirection.transform.Rotate(new Vector3(0, 0, 1), angle);
-        cutDirection.SetCutDirection(cutDirection.GetCutDirection(angle));
+        cutDirection.SetCutDirection(CutDirection.GetCutDirection(angle));
     }
 
     private Vector2 PointOnCircle(float radius, float angleInDegrees, Vector2 origin)

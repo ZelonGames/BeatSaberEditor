@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 54019547495102370}
   - component: {fileID: 114127613486642420}
   m_Layer: 0
-  m_Name: ArrowCube
+  m_Name: ArrowCubeBlue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

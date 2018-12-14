@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json;
 
-public class Note : MonoBehaviour
+public partial class Note : MonoBehaviour
 {
     [JsonIgnore]
     public GameObject arrowCube = null;
@@ -41,6 +41,7 @@ public class Note : MonoBehaviour
     [HideInInspector]
     public int _cutDirection;
 
+
     public void Set(double _time, int _lineIndex, int _lineLayer, ColorType _type, CutDirection _cutDirection)
     {
         this._time = _time;
@@ -66,5 +67,28 @@ public class Note : MonoBehaviour
     public void Remove()
     {
         MapCreator._Map.RemoveNote(this);
+    }
+}
+
+public class JsonNote
+{
+    [HideInInspector]
+    public double _time;
+    [HideInInspector]
+    public int _lineIndex;
+    [HideInInspector]
+    public int _lineLayer;
+    [HideInInspector]
+    public int _type;
+    [HideInInspector]
+    public int _cutDirection;
+
+    public JsonNote(double _time, int _lineIndex, int _lineLayer, Note.ColorType _type, Note.CutDirection _cutDirection, bool json = false)
+    {
+        this._time = _time;
+        this._lineIndex = _lineIndex;
+        this._lineLayer = _lineLayer;
+        this._type = (int)_type;
+        this._cutDirection = (int)_cutDirection;
     }
 }

@@ -22,6 +22,8 @@ public class _3DGridGenerator : MonoBehaviour
     public readonly int startYPos = -500;
     public readonly int distance = 150;
 
+    private bool hasGeneratedGrid = false;
+
     public GameObject LastLine { get; private set; }
 
     public static _3DGridGenerator Instance { get; private set; }
@@ -33,15 +35,23 @@ public class _3DGridGenerator : MonoBehaviour
 
     private void Start()
     {
-        int lastLineYPos;
 
         _3DCanvasRect = _3DCanvas.GetComponent<RectTransform>().rect;
         smallLineRect = smallLine.GetComponent<RectTransform>().rect;
+    }
 
-        GenerateHorizontalLines(startYPos, out lastLineYPos);
-        GenerateVerticalLines(startYPos, lastLineYPos + startYPos);
-        InstantiateTimeline();
+    private void Update()
+    {
+        if (MusicPlayer.Instance.IsLoaded && !hasGeneratedGrid)
+        {
+            int lastLineYPos;
 
+            GenerateHorizontalLines(startYPos, out lastLineYPos);
+            GenerateVerticalLines(startYPos, lastLineYPos + startYPos);
+            InstantiateTimeline();
+
+            hasGeneratedGrid = true;
+        }
     }
 
     public double GetBeatPosition(double beat)
@@ -55,7 +65,7 @@ public class _3DGridGenerator : MonoBehaviour
         float cubeHeight = cubeBounds.size.y * cube.transform.localScale.y;
 
         return new Vector2(smallLineRect.x + _3DCanvasRect.width / 4 * coordinate.x + _3DCanvasRect.width / 8,
-            (2 - coordinate.y) * (2 - cubeHeight) - 50 * (2 - coordinate.y) - cubeHeight * 0.5f);
+            (coordinate.y) * (2 - cubeHeight) - 50 * (coordinate.y) - cubeHeight * 0.5f);
     }
 
     private void InstantiateTimeline()

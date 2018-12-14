@@ -23,7 +23,7 @@ public class CutDirection : MonoBehaviour
         hasSetCutDirection = true;
     }
 
-    public Note.CutDirection GetCutDirection(float angle)
+    public static Note.CutDirection GetCutDirection(float angle)
     {
         if (angle == 0)
             return Note.CutDirection.Right;
@@ -45,7 +45,7 @@ public class CutDirection : MonoBehaviour
             return Note.CutDirection.Dot;
     }
 
-    public float? GetAngle(Note.CutDirection cutDirection)
+    public static float? GetAngle(Note.CutDirection cutDirection)
     {
         switch (cutDirection)
         {
@@ -86,7 +86,6 @@ public class CutDirection : MonoBehaviour
         arrowCube.transform.Rotate(new Vector3(0, 0, -1), GetAngle((Note.CutDirection)note._cutDirection).Value);
         arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
 
-        arrowCube.GetComponent<ArrowCube>().noteParent = note;
         note.arrowCube = arrowCube;
     }
 }

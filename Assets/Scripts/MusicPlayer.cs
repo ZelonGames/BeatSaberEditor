@@ -1,19 +1,26 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MusicPlayer : MonoBehaviour
 {
     [SerializeField]
-    private AudioClip music;
-    [SerializeField]
     private AudioSource audioSource;
 
-    public float MusicLengthInSeconds
+    public float MusicLengthInSeconds()
+    {
+        if (audioSource.clip == null)
+            return 0;
+        return audioSource.clip.length;
+    }
+
+
+    public bool IsLoaded
     {
         get
         {
-            return music.length;
+            return audioSource.clip != null && audioSource.clip.loadState == AudioDataLoadState.Loaded;
         }
     }
 
@@ -22,19 +29,24 @@ public class MusicPlayer : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
 
-    private void Start()
+        StartCoroutine(LoadAudio());
+    }
+    
+    private IEnumerator LoadAudio()
     {
-        audioSource.clip = music;
+        var www = new WWW("file://" + MapCreator.Instance.MapFolderPath(MapCreator._MapInfo.songName) + "/song.ogg");
+        audioSource.clip = www.GetAudioClip();
+        audioSource.clip.name = "song.ogg";
+        yield return www;        
     }
 
     public void ToggleSong()
     {
         audioSource.time = (float)MapEditorManager.Instance.CurrentTimeInSeconds;
-        
+
         if (MapEditorManager.Instance.Playing)
-            audioSource.Play(); 
+            audioSource.Play();
         else
             audioSource.Stop();
     }

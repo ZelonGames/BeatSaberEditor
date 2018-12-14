@@ -9,7 +9,7 @@ public class BtbColorSwitcher : MonoBehaviour
     private Text btnText = null;
     private ColorBlock colorBlock;
 
-    private Color HighlightedColor
+    private Color PressedColor
     {
         get
         {
@@ -39,12 +39,12 @@ public class BtbColorSwitcher : MonoBehaviour
         {
             case Note.ColorType.Red:
                 colorBlock.normalColor = Color.red;
-                colorBlock.highlightedColor = HighlightedColor;
+                colorBlock.pressedColor = PressedColor;
                 btnText.text = "Red";
                 break;
             case Note.ColorType.Blue:
                 colorBlock.normalColor = Color.blue;
-                colorBlock.highlightedColor = HighlightedColor;
+                colorBlock.pressedColor = PressedColor;
                 btnText.text = "Blue";
                 break;
             default:

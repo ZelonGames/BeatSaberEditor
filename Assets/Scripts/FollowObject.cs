@@ -16,7 +16,7 @@ public class FollowObject : MonoBehaviour
         distanceVector = gameObject.transform.position - targetTransform.position;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         gameObject.transform.position = targetTransform.position + distanceVector;
     }

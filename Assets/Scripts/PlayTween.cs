@@ -14,7 +14,7 @@ public class PlayTween : MonoBehaviour
         var destination = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, (float)_3DGridGenerator.Instance.GetBeatPosition(MapCreator._Map.AmountOfBeatsInSong()));
 
         if (MapEditorManager.Instance.Playing)
-            iTween.MoveTo(gameObject, iTween.Hash("position", destination, "time", MusicPlayer.Instance.MusicLengthInSeconds, "easetype", iTween.EaseType.linear));
+            iTween.MoveTo(gameObject, iTween.Hash("position", destination, "time", MusicPlayer.Instance.MusicLengthInSeconds(), "easetype", iTween.EaseType.linear));
         else
         {
             iTween.Stop();
