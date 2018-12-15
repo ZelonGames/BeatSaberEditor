@@ -42,11 +42,15 @@ public class ItemButton : MonoBehaviour
         {
             Filebrowser.folder.SetPath(path);
             var mapInfo = MapLoader.GetMapInfo(Filebrowser.folder.FileName);
+            if (mapInfo != null)
+                MapLoader.GetJsonMap(mapInfo.songName, mapInfo.difficultyLevels.First().difficulty);
             SceneManager.LoadScene("CreateMapScene");
         }
-
-        filebrowser.paths.Add(path);
-        ShowNewDirectories(path);
+        else
+        {
+            filebrowser.paths.Add(path);
+            ShowNewDirectories(path);
+        }
     }
 
     public void PrevDirectory()

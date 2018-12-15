@@ -27,7 +27,7 @@ public class MapEditorManager : MonoBehaviour
     public double CurrentTime { get; private set; }
     public bool Playing { get; private set; }
 
-    public double CurrentTimeInSeconds
+    public double CurrentBeatTimeInSeconds
     {
         get
         {

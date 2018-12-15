@@ -6,9 +6,6 @@ using Newtonsoft.Json;
 
 public static class MapLoader
 {
-    public static bool HasLoadedMapInfo { get; private set; }
-    public static bool HasLoadedJsonMap { get; private set; }
-
     public static MapInfo GetMapInfo(string songName)
     {
         string file = Filebrowser.CustomSongsPath + "/" + songName + "/info.json";
@@ -17,7 +14,6 @@ public static class MapLoader
 
         string json = File.ReadAllText(file);
         MapCreator._MapInfo = JsonConvert.DeserializeObject<MapInfo>(json);
-        HasLoadedMapInfo = MapCreator._MapInfo != null;
         return MapCreator._MapInfo;
     }
 
@@ -29,27 +25,22 @@ public static class MapLoader
 
         string json = File.ReadAllText(file);
         MapCreator._Map = JsonConvert.DeserializeObject<Map>(json);
-        HasLoadedJsonMap = MapCreator._Map != null;
+        MapCreator._Map._notes = new List<JsonNote>();
+        foreach(var note in MapCreator._Map._notesObjects)
+        {
+            MapCreator._Map._notes.Add(new JsonNote(note._time, note._lineIndex, note._lineLayer, (Note.ColorType)note._type, (Note.CutDirection)note._cutDirection));
+        }
+        MapCreator._Map._notesObjects.Clear();
         return MapCreator._Map;
     }
 
-    public static void LoadMap(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, string songName, string difficulty)
+    public static void LoadMap(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab)
     {
-        string mapFilePath = MapCreator.Instance.MapFolderPath(songName) + "/" + difficulty + ".json";
-        if (!File.Exists(mapFilePath))
-            return;
-
-        string json = File.ReadAllText(mapFilePath);
-
-        Map jsonMap = JsonConvert.DeserializeObject<Map>(json);
-        MapCreator._Map = new Map(jsonMap._version, jsonMap._beatsPerMinute, jsonMap._beatsPerBar, jsonMap._noteJumpSpeed, new List<Note>());
-        
-
-        foreach (var note in jsonMap._notesObjects)
-            AddNote(notePrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int(note._lineIndex, note._lineLayer), note._time, (Note.ColorType)note._type);
+        foreach (var note in MapCreator._Map._notes)
+            LoadNote(notePrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int(note._lineIndex, note._lineLayer), note._time, (Note.ColorType)note._type);
     }
 
-    private static void AddNote(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int tileCoordinate, double time, Note.ColorType color)
+    private static void LoadNote(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int tileCoordinate, double time, Note.ColorType color)
     {
         var note = MapCreator._Map.AddNote(notePrefab, cutDirection, tileCoordinate, time, color);
 
@@ -62,10 +53,5 @@ public static class MapLoader
         arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
 
         note.arrowCube = arrowCube;
-    }
-
-    public static void Reset()
-    {
-        HasLoadedMapInfo = HasLoadedJsonMap = false;
     }
 }

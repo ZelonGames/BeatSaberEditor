@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using Newtonsoft.Json;
 
-public partial class Note : MonoBehaviour
+public class Note : MonoBehaviour
 {
-    [JsonIgnore]
     public GameObject arrowCube = null;
 
     public enum CutDirection
@@ -40,7 +38,6 @@ public partial class Note : MonoBehaviour
     public int _type;
     [HideInInspector]
     public int _cutDirection;
-
 
     public void Set(double _time, int _lineIndex, int _lineLayer, ColorType _type, CutDirection _cutDirection)
     {
@@ -83,7 +80,7 @@ public class JsonNote
     [HideInInspector]
     public int _cutDirection;
 
-    public JsonNote(double _time, int _lineIndex, int _lineLayer, Note.ColorType _type, Note.CutDirection _cutDirection, bool json = false)
+    public JsonNote(double _time, int _lineIndex, int _lineLayer, Note.ColorType _type, Note.CutDirection _cutDirection)
     {
         this._time = _time;
         this._lineIndex = _lineIndex;

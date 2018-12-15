@@ -20,7 +20,7 @@ public class _3DGridGenerator : MonoBehaviour
     private Rect smallLineRect;
 
     public readonly int startYPos = -500;
-    public readonly int distance = 150;
+    public readonly int distance = 80;
 
     private bool hasGeneratedGrid = false;
 
