@@ -75,7 +75,7 @@ public class MapEditorManager : MonoBehaviour
         if (!playingPrecision.HasValue)
             SetPlayingPrecision();
 
-        if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / playingPrecision.Value)
+        if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / (playingPrecision.HasValue ? playingPrecision.Value : Precision))
         {
             ChangeTime(true, true);
             timer = 0;
