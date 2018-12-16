@@ -22,7 +22,7 @@ public class BtbColorSwitcher : MonoBehaviour
     {
         buttonComponent = gameObject.GetComponent<Button>();
         btnText = buttonComponent.GetComponentInChildren<Text>();
-        colorBlock = buttonComponent.colors;
+        
 
         UpdateButtonColor();
     }
@@ -35,16 +35,18 @@ public class BtbColorSwitcher : MonoBehaviour
 
     private void UpdateButtonColor()
     {
+        colorBlock = buttonComponent.colors;
+
         switch (MapEditorManager.Instance.CurrentColor)
         {
             case Note.ColorType.Red:
                 colorBlock.normalColor = Color.red;
-                colorBlock.pressedColor = PressedColor;
+                colorBlock.pressedColor = colorBlock.highlightedColor = PressedColor;
                 btnText.text = "Red";
                 break;
             case Note.ColorType.Blue:
                 colorBlock.normalColor = Color.blue;
-                colorBlock.pressedColor = PressedColor;
+                colorBlock.pressedColor = colorBlock.highlightedColor = PressedColor;
                 btnText.text = "Blue";
                 break;
             default:
