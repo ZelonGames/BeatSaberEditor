@@ -15,7 +15,6 @@ public class MapEditorManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
 
-    private double timer = 0;
     private double? playingPrecision;
 
     #endregion
@@ -26,6 +25,7 @@ public class MapEditorManager : MonoBehaviour
     public int Precision { get; private set; }
     public double CurrentTime { get; private set; }
     public bool Playing { get; private set; }
+    private double bpmInSeconds;
 
     public double CurrentBeatTimeInSeconds
     {
@@ -47,13 +47,8 @@ public class MapEditorManager : MonoBehaviour
         CurrentColor = Note.ColorType.Blue;
         Precision = 1;
 
+        bpmInSeconds = GetBPMInSeconds(MapCreator._Map._beatsPerMinute);
         UpdateBeatTimeText();
-    }
-
-    private void FixedUpdate()
-    {
-        if (Playing)
-            Play(MapCreator._Map._beatsPerMinute);
     }
 
     #endregion
@@ -62,23 +57,28 @@ public class MapEditorManager : MonoBehaviour
 
     public void Play()
     {
-        timer = 0;
         Playing = !Playing;
         if (!Playing)
+        {
             playingPrecision = null;
+            StopCoroutine(PlayCoroutine());
+        }
+        else
+        {
+            if (!playingPrecision.HasValue)
+                SetPlayingPrecision();
+            StartCoroutine(PlayCoroutine());
+        }
     }
 
-    public void Play(int bpm)
+    public IEnumerator PlayCoroutine()
     {
-        timer += Time.deltaTime;
-
-        if (!playingPrecision.HasValue)
-            SetPlayingPrecision();
-
-        if (timer >= GetBPMInSeconds(MapCreator._Map._beatsPerMinute) / (playingPrecision.HasValue ? playingPrecision.Value : Precision))
+        while (Playing)
         {
+            yield return new WaitForSeconds((float)bpmInSeconds / (float)(playingPrecision.HasValue ? playingPrecision.Value : Precision));
             ChangeTime(true, true);
-            timer = 0;
+            if (!playingPrecision.HasValue)
+                SetPlayingPrecision();
         }
     }
 

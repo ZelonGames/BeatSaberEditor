@@ -3,8 +3,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class ItemButton : MonoBehaviour
 {
@@ -60,6 +60,34 @@ public class ItemButton : MonoBehaviour
 
         filebrowser.paths.Remove(filebrowser.paths.Last());
         ShowNewDirectories(filebrowser.paths.Last());
+    }
+
+    public void Delete()
+    {
+        if (!(filebrowser.browseCustomSongs || isFile))
+            return;
+
+        string message = "";
+        if (isFile)
+            message = "Are you sure you want to delete this file?";
+        else if (filebrowser.browseCustomSongs)
+            message = "Are you sure you want to delete this map?";
+
+        //if (EditorUtility.DisplayDialog("", message, "Yes", "No"))
+        {
+            if (isFile)
+                File.Delete(path);
+            else if (filebrowser.browseCustomSongs)
+            {
+                string[] files = Directory.GetFiles(path);
+                foreach (var file in files)
+                    File.Delete(file);
+
+                Directory.Delete(path);
+            }
+
+            GameObject.Destroy(gameObject);
+        }
     }
 
     public void ShowNewDirectories(string path)
