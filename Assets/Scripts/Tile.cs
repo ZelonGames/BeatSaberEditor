@@ -10,6 +10,8 @@ public class Tile : MonoBehaviour
 
     public Vector2Int Coordinate { get; private set; }
 
+    private static List<GameObject> cutDirectionsToDestroy = new List<GameObject>();
+
     private void Start()
     {
 
@@ -39,11 +41,12 @@ public class Tile : MonoBehaviour
 
     private void DestroyAllCutDirections()
     {
-        GameObject[] cutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
-        foreach (var cutDirection in cutDirections)
+        foreach (var cutDirection in cutDirectionsToDestroy)
         {
             Destroy(cutDirection);
         }
+
+        cutDirectionsToDestroy.Clear();
     }
 
     private void InstantiateCutDirection(Vector2 position, float angle)
@@ -54,6 +57,8 @@ public class Tile : MonoBehaviour
         cutDirection.transform.position = position;
         cutDirection.transform.Rotate(new Vector3(0, 0, 1), angle);
         cutDirection.SetCutDirection(CutDirection.GetCutDirection(angle));
+
+        cutDirectionsToDestroy.Add(cutDirection.gameObject);
     }
 
     private Vector2 PointOnCircle(float radius, float angleInDegrees, Vector2 origin)
