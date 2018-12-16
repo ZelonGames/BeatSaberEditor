@@ -6,7 +6,6 @@ public class Tile : MonoBehaviour
 {
     public CutDirection cutDirectionPrefab;
 
-    private bool isPressed = false;
     private bool hasSetCoordinate = false;
 
     public Vector2Int Coordinate { get; private set; }
@@ -28,28 +27,23 @@ public class Tile : MonoBehaviour
 
     public void TouchDown()
     {
+        DestroyAllCutDirections();
+
         int angle = 0;
         for (int i = 0; i < 8; i++)
         {
             InstantiateCutDirection(PointOnCircle(120, angle, gameObject.transform.position), angle);
             angle += 45;
         }
-
-        isPressed = true;
     }
 
-    public void TouchRelease()
+    private void DestroyAllCutDirections()
     {
-        if (!isPressed)
-            return;
-        /*
-        var cutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
+        GameObject[] cutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
         foreach (var cutDirection in cutDirections)
         {
             Destroy(cutDirection);
-        }*/
-
-        isPressed = false;
+        }
     }
 
     private void InstantiateCutDirection(Vector2 position, float angle)
