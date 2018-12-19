@@ -85,9 +85,7 @@ public class Map
 
         NoteTimeChunks[_time].Add(note);
         _notesObjects.Add(note);
-        var btnCutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
-        foreach (var btnCutDirection in btnCutDirections)
-            GameObject.Destroy(btnCutDirection);
+        Tile.DeActivateCutDirectionTool();
 
         return note;
     }

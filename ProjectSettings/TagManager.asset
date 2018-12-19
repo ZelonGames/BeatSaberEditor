@@ -19,7 +19,7 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
+  - UIGrid
   - 
   - 
   - 
@@ -45,4 +45,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: UIGrid
+    uniqueID: 3862129285
     locked: 0

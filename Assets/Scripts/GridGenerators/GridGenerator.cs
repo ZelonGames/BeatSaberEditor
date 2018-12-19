@@ -11,6 +11,15 @@ public class GridGenerator : MonoBehaviour
 
     public static GridGenerator Instance { get; private set; }
 
+    private Rect rect;
+    private Rect canvasRect;
+    private Rect tileRectTemplate = new Rect();
+
+    [SerializeField]
+    private int tileDistance = 4;
+    [SerializeField]
+    private int maxCutDirectionRadius = 120;
+
     private void Awake()
     {
         Instance = this;
@@ -19,32 +28,44 @@ public class GridGenerator : MonoBehaviour
     private void Start()
     {
         Tiles = new Dictionary<Vector2Int, Tile>();
-        CreateGrid(4);
+        rect = gameObject.GetComponent<RectTransform>().rect;
+        canvasRect = canvas.GetComponent<RectTransform>().rect;
+        CreateGrid();
     }
 
-    private void CreateGrid(int distance)
+    private void CreateGrid()
     {
-        var canvasRect = canvas.GetComponent<RectTransform>().rect;
-        var tileRect = tilePrefab.GetComponent<RectTransform>().rect;
+        int tilesInX = 4;
+        int tilesInY = 3;
 
-        int width = 4;
-        int height = 3;
+        float tileSize = (rect.width - tileDistance * (tilesInX - 1)) / tilesInX;
 
-        float totalWidth = tileRect.width * width + distance * (width - 1);
-        float distanceFromCenter = (canvasRect.width - totalWidth) * 0.5f;
-
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < tilesInX; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < tilesInY; y++)
             {
-                var newTile = Instantiate(tilePrefab);
+                Tile newTile = Instantiate(tilePrefab);
+                var tileRect = newTile.gameObject.GetComponent<RectTransform>();
+                tileRect.sizeDelta = new Vector2(tileSize, tileSize);
                 newTile.gameObject.transform.SetParent(gameObject.transform, false);
-                newTile.transform.position = new Vector3(
-                    tileRect.width * 0.5f + tileRect.width * x + distance * x + 150, 
-                    canvasRect.height - tileRect.height * 0.5f - 100 - tileRect.height * y - distance * y, x);
-                newTile.SetCoordinate(new Vector2Int(x, height - 1 - y));
-                Tiles.Add(new Vector2Int(x, 2 - y), newTile);
+                newTile.gameObject.transform.position = new Vector3(
+                    gameObject.transform.position.x - rect.width * 0.5f + tileRect.sizeDelta.x * 0.5f + tileRect.sizeDelta.x * x + tileDistance * x,
+                    gameObject.transform.position.y + rect.height * 0.5f - tileRect.sizeDelta.y * 0.5f - tileRect.sizeDelta.y * y - tileDistance * y);
+                var coordinate = new Vector2Int(x, tilesInY - 1 - y);
+                newTile.SetCoordinate(coordinate);
+
+                Tiles.Add(coordinate, newTile);
             }
         }
+
+        tileRectTemplate.width = tileRectTemplate.height = tileSize;
+    }
+
+    public float GetMaxRadius(float cutDirectionRadius)
+    {
+        float radiusLeftSide = gameObject.transform.position.x - rect.width * 0.5f + tileRectTemplate.width * 0.5f + cutDirectionRadius;
+        float radiusRightSide = canvasRect.width - (gameObject.transform.position.x + rect.width * 0.5f) + tileRectTemplate.width * 0.5f - cutDirectionRadius;
+
+        return Mathf.Min(new float[] { radiusLeftSide, radiusRightSide, maxCutDirectionRadius });
     }
 }

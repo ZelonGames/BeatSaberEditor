@@ -98,7 +98,7 @@ public class _3DGridGenerator : MonoBehaviour
         lastLineYPos = yPos;
     }
 
-    private void GenerateVerticalLines(int yPos, int length)
+    private void GenerateVerticalLines(int yPos, float length)
     {
         float xPos = smallLineRect.x;
         for (int i = 0; i < 5; i++)

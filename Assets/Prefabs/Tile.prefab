@@ -41,7 +41,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 875aa91dbfc87d74bb1b34fb196e159e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cutDirectionRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   cutDirectionPrefab: {fileID: 114329077722247058, guid: baa0e939efe45c84cbdad7fe70801c7b,
+    type: 2}
+  circlePrefab: {fileID: 1785558068306056, guid: 4d6e5c122de47f94b97be70ed7d09560,
     type: 2}
 --- !u!114 &114404621908053604
 MonoBehaviour:
