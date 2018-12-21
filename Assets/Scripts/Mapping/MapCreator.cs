@@ -47,6 +47,8 @@ public class MapCreator : MonoBehaviour
     private GameObject blueCubePrefab;
     [SerializeField]
     private GameObject redCubePrefab;
+    [SerializeField]
+    private GameObject bombSpherePrefab;
 
     private static MapData mapData = new MapData();
 
@@ -92,7 +94,7 @@ public class MapCreator : MonoBehaviour
         if (currentScene.name == "EditingScene")
         {
             if (_Map != null && _MapInfo != null)
-                MapLoader.LoadMap(notePrefab, blueCubePrefab, redCubePrefab);
+                MapLoader.LoadMap(notePrefab, bombSpherePrefab, blueCubePrefab, redCubePrefab);
         }
     }
 
@@ -242,7 +244,7 @@ public class MapCreator : MonoBehaviour
 
         foreach (var note in _Map._notesObjects)
         {
-            jsonNotes.Add(new JsonNote(note._time, note._lineIndex, note._lineLayer, (Note.ColorType)note._type, (Note.CutDirection)note._cutDirection));
+            jsonNotes.Add(new JsonNote(note._time, note._lineIndex, note._lineLayer, (Note.ItemType)note._type, (Note.CutDirection)note._cutDirection));
         }
 
         _Map._notes = jsonNotes;

@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class Note : MonoBehaviour
 {
+    [SerializeField]
+    private Sprite bombImage;
     [HideInInspector]
     public GameObject arrowCube = null;
 
@@ -23,10 +25,11 @@ public class Note : MonoBehaviour
         Dot = 8,
     }
 
-    public enum ColorType
+    public enum ItemType
     {
         Red = 0,
         Blue = 1,
+        Bomb = 3,
     }
 
     [HideInInspector]
@@ -40,15 +43,7 @@ public class Note : MonoBehaviour
     [HideInInspector]
     public int _cutDirection;
 
-    private void Start()
-    {/*
-        gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
-        gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle((CutDirection)_cutDirection).Value);
-        var coordinate = new Vector2Int(_lineIndex, _lineLayer);
-        gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;*/
-    }
-
-    public void Set(double _time, int _lineIndex, int _lineLayer, ColorType _type, CutDirection _cutDirection)
+    public void Set(double _time, int _lineIndex, int _lineLayer, ItemType _type, CutDirection _cutDirection)
     {
         this._time = _time;
         this._lineIndex = _lineIndex;
@@ -59,32 +54,36 @@ public class Note : MonoBehaviour
         var image = gameObject.GetComponent<Image>();
         switch (_type)
         {
-            case ColorType.Red:
+            case ItemType.Bomb:
+                image.sprite = bombImage;
+                image.color = Color.black;
+                break;
+            case ItemType.Red:
                 image.color = Color.red;
                 break;
-            case ColorType.Blue:
+            case ItemType.Blue:
                 image.color = Color.blue;
                 break;
             default:
                 break;
         }
     }
+
+    public void Remove()
+    {
+        MapCreator._Map.RemoveNote(this);
+    }
 }
 
 public class JsonNote
 {
-    [HideInInspector]
     public double _time;
-    [HideInInspector]
     public int _lineIndex;
-    [HideInInspector]
     public int _lineLayer;
-    [HideInInspector]
     public int _type;
-    [HideInInspector]
     public int _cutDirection;
 
-    public JsonNote(double _time, int _lineIndex, int _lineLayer, Note.ColorType _type, Note.CutDirection _cutDirection)
+    public JsonNote(double _time, int _lineIndex, int _lineLayer, Note.ItemType _type, Note.CutDirection _cutDirection)
     {
         this._time = _time;
         this._lineIndex = _lineIndex;

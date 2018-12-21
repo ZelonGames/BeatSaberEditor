@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,14 +37,14 @@ public class BtbColorSwitcher : MonoBehaviour
     {
         colorBlock = buttonComponent.colors;
 
-        switch (MapEditorManager.Instance.CurrentColor)
+        switch (MapEditorManager.Instance.ItemType)
         {
-            case Note.ColorType.Red:
+            case Note.ItemType.Red:
                 colorBlock.normalColor = Color.red;
                 colorBlock.pressedColor = colorBlock.highlightedColor = PressedColor;
                 btnText.text = "Red";
                 break;
-            case Note.ColorType.Blue:
+            case Note.ItemType.Blue:
                 colorBlock.normalColor = Color.blue;
                 colorBlock.pressedColor = colorBlock.highlightedColor = PressedColor;
                 btnText.text = "Blue";

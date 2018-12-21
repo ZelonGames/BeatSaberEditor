@@ -21,7 +21,7 @@ public class MapEditorManager : MonoBehaviour
 
     #region Properties
 
-    public Note.ColorType CurrentColor { get; private set; }
+    public Note.ItemType ItemType { get; private set; }
     public int Precision { get; private set; }
     public double CurrentTime { get; private set; }
     public bool Playing { get; private set; }
@@ -44,18 +44,14 @@ public class MapEditorManager : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        CurrentColor = Note.ColorType.Blue;
+        ItemType = Note.ItemType.Blue;
         Precision = 1;
 
         bpmInSeconds = GetBPMInSeconds(MapCreator._Map._beatsPerMinute);
         UpdateBeatTimeText();
     }
 
-    #endregion
-
-    #region Methods
-
-    public void Play()
+    public void OnPlay()
     {
         Playing = !Playing;
         if (!Playing)
@@ -71,6 +67,31 @@ public class MapEditorManager : MonoBehaviour
         }
     }
 
+    public void OnIncreasePrecision()
+    {
+        if (Precision < 64)
+            Precision++;
+
+        UpdatePrecisionText();
+    }
+
+    public void OnDecreasePrecision()
+    {
+        if (Precision > 1)
+            Precision--;
+
+        UpdatePrecisionText();
+    }
+
+    #endregion
+
+    #region Methods
+
+    public void ChangeToBombType()
+    {
+        ItemType = Note.ItemType.Bomb;
+    }
+
     public IEnumerator PlayCoroutine()
     {
         while (Playing)
@@ -80,22 +101,6 @@ public class MapEditorManager : MonoBehaviour
             if (!playingPrecision.HasValue)
                 SetPlayingPrecision();
         }
-    }
-
-    public void IncreasePrecision()
-    {
-        if (Precision < 64)
-            Precision++;
-
-        UpdatePrecisionText();
-    }
-
-    public void DecreasePrecision()
-    {
-        if (Precision > 1)
-            Precision--;
-
-        UpdatePrecisionText();
     }
 
     private void SetPlayingPrecision()
@@ -143,13 +148,16 @@ public class MapEditorManager : MonoBehaviour
 
     public void SwitchColor()
     {
-        switch (CurrentColor)
+        switch (ItemType)
         {
-            case Note.ColorType.Red:
-                CurrentColor = Note.ColorType.Blue;
+            case Note.ItemType.Bomb:
+                ItemType = Note.ItemType.Blue;
                 break;
-            case Note.ColorType.Blue:
-                CurrentColor = Note.ColorType.Red;
+            case Note.ItemType.Red:
+                ItemType = Note.ItemType.Blue;
+                break;
+            case Note.ItemType.Blue:
+                ItemType = Note.ItemType.Red;
                 break;
         }
     }

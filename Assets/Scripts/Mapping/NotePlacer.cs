@@ -86,7 +86,7 @@ public class NotePlacer : MonoBehaviour
     private void UpdateCutDirectionValues(Tile tile, CutDirectionButton cutDirection)
     {
         cutDirection.tileParent = tile;
-        cutDirection.GetComponent<Image>().color = MapEditorManager.Instance.CurrentColor == Note.ColorType.Red ? Color.red : Color.blue;
+        cutDirection.GetComponent<Image>().color = MapEditorManager.Instance.ItemType == Note.ItemType.Red ? Color.red : Color.blue;
     }
 
     public void MoveDownGameObjectIndex(GameObject gameObject)

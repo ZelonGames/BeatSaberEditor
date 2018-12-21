@@ -9,9 +9,13 @@ public class Map
 {
     #region Fields
 
+    #region Items
+
     [JsonIgnore]
     public List<Note> _notesObjects;
     public List<JsonNote> _notes;
+
+    #endregion
 
     public string _version;
     public int _beatsPerMinute;
@@ -72,7 +76,7 @@ public class Map
             _notesObjects.Clear();
     }
     
-    public Note AddNote(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ColorType color, bool active = false)
+    public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
     {
         if (!NoteTimeChunks.ContainsKey(time))
             NoteTimeChunks.Add(time, new List<Note>());
@@ -81,14 +85,28 @@ public class Map
         note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
         note.gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle(cutDirection).Value);
         note.gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;
-        note.Set(GetBeatTime(_beatsPerMinute, 0, time), coordinate.x, coordinate.y, color, cutDirection);
+        note.Set(GetBeatTime(_beatsPerMinute, 0, time), coordinate.x, coordinate.y, type, cutDirection);
 
         NoteTimeChunks[time].Add(note);
         _notesObjects.Add(note);
 
         note.gameObject.SetActive(active);
 
-        GameObject arrowCube = color == Note.ColorType.Blue ? GameObject.Instantiate(blueCubePrefab) : GameObject.Instantiate(redCubePrefab);
+        GameObject arrowCube = null;
+        switch (type)
+        {
+            case Note.ItemType.Red:
+                arrowCube = GameObject.Instantiate(redCubePrefab);
+                break;
+            case Note.ItemType.Blue:
+                arrowCube = GameObject.Instantiate(blueCubePrefab);
+                break;
+            case Note.ItemType.Bomb:
+                arrowCube = GameObject.Instantiate(bombSpherePrefab);
+                break;
+            default:
+                break;
+        }
         Vector2 arrowCubePos = _3DGridGenerator.Instance.GetCoordinatePosition(coordinate, arrowCube);
 
         arrowCube.transform.position = new Vector3(arrowCubePos.x, (float)_3DGridGenerator.Instance.GetBeatPosition(time), arrowCubePos.y);
@@ -123,11 +141,6 @@ public class Map
                 return note;
         }
 
-        return null;
-    }
-
-    public Note GetNextNote(double currentTime)
-    {
         return null;
     }
 

@@ -71,10 +71,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b41803e2682c22f45baa78a9f0bd0d77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blueCubePrefab: {fileID: 1580229957885594, guid: 3984daa3305c9484fbd7f2cdfc827dbb,
-    type: 2}
-  redCubePrefab: {fileID: 1984173337119590, guid: ff95db9570d4c1647a73928bd75ca34d,
-    type: 2}
+  bombImage: {fileID: 21300000, guid: d9f36c070d79ef94b92ecca48ef277df, type: 3}
+  arrowCube: {fileID: 0}
   _time: 0
   _lineIndex: 0
   _lineLayer: 0

@@ -6,16 +6,21 @@ using UnityEngine.UI;
 public class Tile : MonoBehaviour
 {
     [SerializeField]
+    private Note notePrefab;
+    [SerializeField]
+    private GameObject arrowCubeBluePrefab;
+    [SerializeField]
+    private GameObject arrowCubeRedPrefab;
+    [SerializeField]
+    private GameObject bombSpherePrefab;
+
+    [SerializeField]
     private NotePlacer notePlacerPrefab;
     private static NotePlacer notePlacer = null;
 
     private bool hasSetCoordinate = false;
 
     public Vector2Int Coordinate { get; private set; }
-
-    private void Start()
-    {
-    }
 
     public void SetCoordinate(Vector2Int coordinate)
     {
@@ -28,6 +33,27 @@ public class Tile : MonoBehaviour
     }
 
     public void TouchDown()
+    {
+        switch (MapEditorManager.Instance.ItemType)
+        {
+            case Note.ItemType.Red:
+            case Note.ItemType.Blue:
+                PlaceNotes();
+                break;
+            case Note.ItemType.Bomb:
+                PlaceBombs();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void PlaceBombs()
+    {
+        MapCreator._Map.AddNote(notePrefab, bombSpherePrefab, arrowCubeBluePrefab, arrowCubeRedPrefab, Note.CutDirection.Up, Coordinate, MapEditorManager.Instance.CurrentTime, MapEditorManager.Instance.ItemType, true);
+    }
+
+    private void PlaceNotes()
     {
         if (notePlacer == null)
         {
