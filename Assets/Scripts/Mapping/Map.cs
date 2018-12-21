@@ -71,59 +71,46 @@ public class Map
         if (_notesObjects != null)
             _notesObjects.Clear();
     }
-
-    public Note AddNote(Note notePrefab, CutDirection cutDirection, Tile tile, double _time, Note.ColorType color)
+    
+    public Note AddNote(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ColorType color, bool active = false)
     {
-        if (!NoteTimeChunks.ContainsKey(_time))
-            NoteTimeChunks.Add(_time, new List<Note>());
+        if (!NoteTimeChunks.ContainsKey(time))
+            NoteTimeChunks.Add(time, new List<Note>());
 
         var note = GameObject.Instantiate(notePrefab);
         note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
-        note.gameObject.transform.Rotate(Vector3.forward, CutDirection.GetAngle(cutDirection._CutDirection).Value);
-        note.gameObject.transform.position = tile.gameObject.transform.position;
-        note.Set(GetBeatTime(_beatsPerMinute, 0, _time), tile.Coordinate.x, tile.Coordinate.y, color, cutDirection._CutDirection);
-
-        NoteTimeChunks[_time].Add(note);
-        _notesObjects.Add(note);
-        Tile.DeActivateCutDirectionTool();
-
-        return note;
-    }
-
-    public Note AddNote(Note notePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double _time, Note.ColorType color)
-    {
-        if (!NoteTimeChunks.ContainsKey(_time))
-            NoteTimeChunks.Add(_time, new List<Note>());
-
-        var note = GameObject.Instantiate(notePrefab);
-        note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
-        note.gameObject.transform.Rotate(Vector3.forward, CutDirection.GetAngle(cutDirection).Value);
+        note.gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle(cutDirection).Value);
         note.gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;
-        note.Set(GetBeatTime(_beatsPerMinute, 0, _time), coordinate.x, coordinate.y, color, cutDirection);
+        note.Set(GetBeatTime(_beatsPerMinute, 0, time), coordinate.x, coordinate.y, color, cutDirection);
 
-        NoteTimeChunks[_time].Add(note);
+        NoteTimeChunks[time].Add(note);
         _notesObjects.Add(note);
-        var btnCutDirections = GameObject.FindGameObjectsWithTag("CutDirection");
-        foreach (var btnCutDirection in btnCutDirections)
-            GameObject.Destroy(btnCutDirection);
 
-        note.gameObject.SetActive(false);
+        note.gameObject.SetActive(active);
+
+        GameObject arrowCube = color == Note.ColorType.Blue ? GameObject.Instantiate(blueCubePrefab) : GameObject.Instantiate(redCubePrefab);
+        Vector2 arrowCubePos = _3DGridGenerator.Instance.GetCoordinatePosition(coordinate, arrowCube);
+
+        arrowCube.transform.position = new Vector3(arrowCubePos.x, (float)_3DGridGenerator.Instance.GetBeatPosition(time), arrowCubePos.y);
+        arrowCube.transform.Rotate(Vector3.back, CutDirectionButton.GetAngle((Note.CutDirection)note._cutDirection).Value);
+        arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
+
+        note.arrowCube = arrowCube;
 
         return note;
     }
-
 
     public double AmountOfBeatsInSong()
     {
         return MusicPlayer.Instance.MusicLengthInSeconds() / BeatLenghtInSeconds;
     }
 
-    public double GetBeatTime(double bpm, double ms, double _time)
+    public static double GetBeatTime(double bpm, double ms, double _time)
     {
         return GetMSInBeats(bpm, ms) + _time;
     }
 
-    public double GetMSInBeats(double bpm, double ms)
+    public static double GetMSInBeats(double bpm, double ms)
     {
         return (bpm / 60000) * ms;
     }

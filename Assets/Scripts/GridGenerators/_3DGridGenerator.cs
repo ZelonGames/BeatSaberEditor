@@ -35,7 +35,6 @@ public class _3DGridGenerator : MonoBehaviour
 
     private void Start()
     {
-
         _3DCanvasRect = _3DCanvas.GetComponent<RectTransform>().rect;
         smallLineRect = smallLine.GetComponent<RectTransform>().rect;
     }

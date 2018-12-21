@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CutDirection : MonoBehaviour
+public class CutDirectionButton : MonoBehaviour
 {
-    public GameObject arrowCubeBluePrefab;
-    public GameObject arrowCubeRedPrefab;
-    public Note notePrefab;
+    private GameObject notePlacer;
+    [SerializeField]
+    private GameObject arrowCubeBluePrefab;
+    [SerializeField]
+    private GameObject arrowCubeRedPrefab;
+    [SerializeField]
+    private Note notePrefab;
     private bool hasSetCutDirection = false;
 
     public Tile tileParent { get; set; }
@@ -76,16 +80,8 @@ public class CutDirection : MonoBehaviour
 
     public void AddNote()
     {
-        var note = MapCreator._Map.AddNote(notePrefab, this, tileParent, MapEditorManager.Instance.CurrentTime, MapEditorManager.Instance.CurrentColor);
-
-        GameObject arrowCube = MapEditorManager.Instance.CurrentColor == Note.ColorType.Blue ? Instantiate(arrowCubeBluePrefab) : Instantiate(arrowCubeRedPrefab);
-
-        Vector2 coordinate = _3DGridGenerator.Instance.GetCoordinatePosition(new Vector2Int(note._lineIndex, note._lineLayer), arrowCube);
-
-        arrowCube.transform.position = new Vector3(coordinate.x, (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.CurrentTime), coordinate.y);
-        arrowCube.transform.Rotate(new Vector3(0, 0, -1), GetAngle((Note.CutDirection)note._cutDirection).Value);
-        arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
-
-        note.arrowCube = arrowCube;
+        notePlacer = GameObject.FindGameObjectWithTag("NotePlacer");
+        MapCreator._Map.AddNote(notePrefab, arrowCubeBluePrefab, arrowCubeRedPrefab, _CutDirection, tileParent.Coordinate, MapEditorManager.Instance.CurrentTime, MapEditorManager.Instance.CurrentColor, true);
+        notePlacer.SetActive(false);
     }
 }

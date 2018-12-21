@@ -18,7 +18,7 @@ public class BtbColorSwitcher : MonoBehaviour
         }
     }
 
-    void Start()
+    private void Start()
     {
         buttonComponent = gameObject.GetComponent<Button>();
         btnText = buttonComponent.GetComponentInChildren<Text>();

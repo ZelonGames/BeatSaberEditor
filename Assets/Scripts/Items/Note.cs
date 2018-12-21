@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class Note : MonoBehaviour
 {
+    [HideInInspector]
     public GameObject arrowCube = null;
 
     public enum CutDirection
@@ -39,6 +40,14 @@ public class Note : MonoBehaviour
     [HideInInspector]
     public int _cutDirection;
 
+    private void Start()
+    {/*
+        gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
+        gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle((CutDirection)_cutDirection).Value);
+        var coordinate = new Vector2Int(_lineIndex, _lineLayer);
+        gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;*/
+    }
+
     public void Set(double _time, int _lineIndex, int _lineLayer, ColorType _type, CutDirection _cutDirection)
     {
         this._time = _time;
@@ -59,11 +68,6 @@ public class Note : MonoBehaviour
             default:
                 break;
         }
-    }
-
-    public void Remove()
-    {
-        MapCreator._Map.RemoveNote(this);
     }
 }
 

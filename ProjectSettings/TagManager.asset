@@ -9,6 +9,7 @@ TagManager:
   - 3DCanvas
   - Directory
   - File
+  - NotePlacer
   layers:
   - Default
   - TransparentFX

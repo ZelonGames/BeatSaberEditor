@@ -249,7 +249,7 @@ public class MapCreator : MonoBehaviour
         jsonMap = JsonConvert.SerializeObject(_Map);
     }
 
-    public void Create()
+    public void OnCreateMap()
     {
         UpdateMapData();
 

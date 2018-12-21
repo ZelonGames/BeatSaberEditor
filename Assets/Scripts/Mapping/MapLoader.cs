@@ -39,21 +39,6 @@ public static class MapLoader
             return;
 
         foreach (var note in MapCreator._Map._notes)
-            LoadNote(notePrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int(note._lineIndex, note._lineLayer), note._time, (Note.ColorType)note._type);
-    }
-
-    private static void LoadNote(Note notePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int tileCoordinate, double time, Note.ColorType color)
-    {
-        var note = MapCreator._Map.AddNote(notePrefab, cutDirection, tileCoordinate, time, color);
-
-        GameObject arrowCube = color == Note.ColorType.Blue ? GameObject.Instantiate(blueCubePrefab) : GameObject.Instantiate(redCubePrefab);
-
-        Vector2 coordinate = _3DGridGenerator.Instance.GetCoordinatePosition(new Vector2Int(note._lineIndex, note._lineLayer), arrowCube);
-
-        arrowCube.transform.position = new Vector3(coordinate.x, (float)_3DGridGenerator.Instance.GetBeatPosition(time), coordinate.y);
-        arrowCube.transform.Rotate(new Vector3(0, 0, -1), CutDirection.GetAngle((Note.CutDirection)note._cutDirection).Value);
-        arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
-
-        note.arrowCube = arrowCube;
+            MapCreator._Map.AddNote(notePrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int(note._lineIndex, note._lineLayer), note._time, (Note.ColorType)note._type, false);
     }
 }
