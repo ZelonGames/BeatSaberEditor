@@ -70,7 +70,7 @@ public class _3DGridGenerator : MonoBehaviour
     private void InstantiateTimeline()
     {
         GameObject timeline = Instantiate(timelinePrefab);
-        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(MapEditorManager.Instance.CurrentTime), 0);
+        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(0), 0);
         timeline.transform.SetParent(_3DCanvas.transform, false);
     }
 

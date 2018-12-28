@@ -261,8 +261,9 @@ public class MapCreator : MonoBehaviour
             _MapInfo = new MapInfo(inputSongName.text, inputSongSubname.text, inputAuthorName.text, Convert.ToInt32(inputBPM.text), 12, 12, "cover.jpg", "DefaultEnvironment", false, new List<DifficultyLevel> { new DifficultyLevel(selectedDifficultyName, 1, "song.ogg", selectedDifficultyName + ".json", 0, 0), });
 
         if (_Map == null)
+            MapLoader.GetJsonMap(_MapInfo.songName, selectedDifficultyName);
+        if (_Map == null)
             _Map = new Map("1.1", Convert.ToInt32(inputBPM.text), 16, Convert.ToInt32(inputNoteJumpSpeed.text), new List<Note>());
-
 
         if (!Directory.Exists(MapFolderPath(inputSongName.text)))
         {

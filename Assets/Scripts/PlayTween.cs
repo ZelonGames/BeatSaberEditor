@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class PlayTween : MonoBehaviour
 {
+    public static PlayTween Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
-        //gameObject.transform.position = GetCameraBeatPosition();
+        gameObject.transform.position = GetBeatPosition();
     }
 
     public void Move()
@@ -15,11 +22,12 @@ public class PlayTween : MonoBehaviour
 
         if (MapEditorManager.Instance.Playing)
             iTween.MoveTo(gameObject, iTween.Hash("position", destination, "time", MusicPlayer.Instance.MusicLengthInSeconds(), "easetype", iTween.EaseType.linear));
-        else
-        {
-            iTween.Stop();
-            gameObject.transform.position = GetBeatPosition();
-        }
+    }
+
+    public void StopMoving()
+    {
+        iTween.Stop();
+        gameObject.transform.position = GetBeatPosition();
     }
 
     public void Step()
@@ -29,6 +37,6 @@ public class PlayTween : MonoBehaviour
 
     private Vector3 GetBeatPosition()
     {
-        return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.CurrentTime));
+        return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.CurrentNoteTimeInBeats) - 800);
     }
 }

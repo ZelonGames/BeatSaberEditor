@@ -3540,6 +3540,7 @@ MonoBehaviour:
   notePrefab: {fileID: 0}
   blueCubePrefab: {fileID: 0}
   redCubePrefab: {fileID: 0}
+  bombSpherePrefab: {fileID: 0}
 --- !u!4 &1947632445
 Transform:
   m_ObjectHideFlags: 0

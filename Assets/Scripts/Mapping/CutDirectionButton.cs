@@ -81,7 +81,7 @@ public class CutDirectionButton : MonoBehaviour
     public void AddNote()
     {
         notePlacer = GameObject.FindGameObjectWithTag("NotePlacer");
-        MapCreator._Map.AddNote(notePrefab, null, arrowCubeBluePrefab, arrowCubeRedPrefab, _CutDirection, tileParent.Coordinate, MapEditorManager.Instance.CurrentTime, MapEditorManager.Instance.ItemType, true);
+        MapCreator._Map.AddNote(notePrefab, null, arrowCubeBluePrefab, arrowCubeRedPrefab, _CutDirection, tileParent.Coordinate, MapEditorManager.Instance.CurrentNoteTimeInBeats, MapEditorManager.Instance.ItemType, true);
         notePlacer.SetActive(false);
     }
 }

@@ -41,9 +41,9 @@ public class ItemButton : MonoBehaviour
         else if (Filebrowser.pathType == Filebrowser.PathType.Folder)
         {
             Filebrowser.folder.SetPath(path);
-            var mapInfo = MapLoader.GetMapInfo(Filebrowser.folder.FileName);
-            if (mapInfo != null)
-                MapLoader.GetJsonMap(mapInfo.songName, mapInfo.difficultyLevels.First().difficulty);
+            MapLoader.GetMapInfo(Filebrowser.folder.FileName);
+            if (MapCreator._MapInfo != null)
+                MapLoader.GetJsonMap(MapCreator._MapInfo.songName, MapCreator._MapInfo.difficultyLevels.First().difficulty);
             SceneManager.LoadScene("CreateMapScene");
         }
         else

@@ -10,12 +10,15 @@ public class MapEditorManager : MonoBehaviour
 {
     #region Fields
 
+    private List<float> timeStamps = new List<float>();
+    private int currentTimeStampIndex = 0;
+
+    [SerializeField]
+    private GameObject timeline;
     [SerializeField]
     private TextMeshProUGUI txtPrecision;
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
-
-    private double? playingPrecision;
 
     #endregion
 
@@ -23,15 +26,23 @@ public class MapEditorManager : MonoBehaviour
 
     public Note.ItemType ItemType { get; private set; }
     public int Precision { get; private set; }
-    public double CurrentTime { get; private set; }
-    public bool Playing { get; private set; }
+    public double NoteTimer { get; private set; }
     private double bpmInSeconds;
+    public bool Playing { get; private set; }
 
-    public double CurrentBeatTimeInSeconds
+    public float CurrentTimeStamp
     {
         get
         {
-            return MapCreator._Map.BeatLenghtInSeconds * CurrentTime;
+            return timeStamps[currentTimeStampIndex];
+        }
+    }
+
+    public double CurrentNoteTimeInBeats
+    {
+        get
+        {
+            return NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60d;
         }
     }
 
@@ -48,139 +59,111 @@ public class MapEditorManager : MonoBehaviour
         Precision = 1;
 
         bpmInSeconds = GetBPMInSeconds(MapCreator._Map._beatsPerMinute);
-        UpdateBeatTimeText();
+        GetTimeStamps();
+    }
+
+    private void Update()
+    {
+        if (Playing)
+        {
+            NoteTimer += Time.deltaTime;
+
+            if (NoteTimer >= CurrentTimeStamp)
+            {
+                ShowHideNotes(false, currentTimeStampIndex - 1);
+                ShowHideNotes(true, currentTimeStampIndex);
+                SetNextTimeStamp();
+            }
+
+            if (currentTimeStampIndex == timeStamps.Count)
+                Playing = false;
+        }
     }
 
     public void OnPlay()
     {
         Playing = !Playing;
-        if (!Playing)
-        {
-            playingPrecision = null;
-            StopCoroutine(PlayCoroutine());
-        }
-        else
-        {
-            if (!playingPrecision.HasValue)
-                SetPlayingPrecision();
-            StartCoroutine(PlayCoroutine());
-        }
     }
 
-    public void OnIncreasePrecision()
+    public void OnBlueArrowSelected()
     {
-        if (Precision < 64)
-            Precision++;
-
-        UpdatePrecisionText();
+        ItemType = Note.ItemType.Blue;
     }
 
-    public void OnDecreasePrecision()
+    public void OnRedArrowSelected()
     {
-        if (Precision > 1)
-            Precision--;
+        ItemType = Note.ItemType.Red;
+    }
 
-        UpdatePrecisionText();
+    public void OnBombSelected()
+    {
+        ItemType = Note.ItemType.Bomb;
     }
 
     #endregion
 
     #region Methods
 
-    public void ChangeToBombType()
+    private void SetNextTimeStamp()
     {
-        ItemType = Note.ItemType.Bomb;
+        if (currentTimeStampIndex < timeStamps.Count)
+            currentTimeStampIndex++;
     }
 
-    public IEnumerator PlayCoroutine()
+    private void GetTimeStamps()
     {
-        while (Playing)
+        timeStamps.Clear();
+        if (MapCreator._Map._notes == null)
+            return;
+
+        foreach (var notes in MapCreator._Map.NoteTimeChunks.Values)
         {
-            yield return new WaitForSeconds((float)bpmInSeconds / (float)(playingPrecision.HasValue ? playingPrecision.Value : Precision));
-            ChangeTime(true, true);
-            if (!playingPrecision.HasValue)
-                SetPlayingPrecision();
+            float noteTime = (float)(bpmInSeconds * notes.First()._time);
+            timeStamps.Add(noteTime);
         }
     }
 
-    private void SetPlayingPrecision()
+    public void ChangePrecision(int value)
     {
-        double? nextTime = null;
-
-        if (MapCreator._Map.NoteTimeChunks.Count > 0 && MapCreator._Map.NoteTimeChunks.Count > MapCreator._Map.NoteTimeChunks.IndexOfKey(CurrentTime) + 1)
-            nextTime = MapCreator._Map.NoteTimeChunks.Values[MapCreator._Map.NoteTimeChunks.IndexOfKey(CurrentTime) + 1].FirstOrDefault()._time;
-        else
-            nextTime = null;
-
-        if (nextTime.HasValue && nextTime.Value > CurrentTime)
-            playingPrecision = 1d / (nextTime.Value - CurrentTime);
-        else
-            playingPrecision = null;
+        Precision = value;
     }
 
-    public void ChangeTime(bool forward, bool autoPlay)
+    public void ChangeTime(bool forward)
     {
+        ShowHideNotes(false, currentTimeStampIndex);
         ShowHideNotes(false);
 
         if (forward)
-            CurrentTime += autoPlay && playingPrecision.HasValue ? 1d / playingPrecision.Value : 1d / Precision;
+            NoteTimer += (float)bpmInSeconds / Precision;
         else
-        {
-            CurrentTime -= 1d / Precision;
-            if (CurrentTime < 0)
-                CurrentTime = 0;
-        }
-
-        UpdateBeatTimeText();
-
-        if (autoPlay)
-            SetPlayingPrecision();
-        else
-            playingPrecision = null;
+            NoteTimer -= (float)bpmInSeconds / Precision;
 
         ShowHideNotes(true);
     }
 
-    public void StepTime(bool forward)
+    public void ShowHideNotes(bool show, int index)
     {
-        ChangeTime(forward, false);
-    }
+        if (index < 0)
+            return;
 
-    public void SwitchColor()
-    {
-        switch (ItemType)
-        {
-            case Note.ItemType.Bomb:
-                ItemType = Note.ItemType.Blue;
-                break;
-            case Note.ItemType.Red:
-                ItemType = Note.ItemType.Blue;
-                break;
-            case Note.ItemType.Blue:
-                ItemType = Note.ItemType.Red;
-                break;
-        }
+        foreach (var note in MapCreator._Map.NoteTimeChunks.Values[index])
+            note.gameObject.SetActive(show);
     }
 
     public void ShowHideNotes(bool show)
     {
-        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(CurrentTime))
+        var currentNoteTimeInBeats = CurrentNoteTimeInBeats;
+
+        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(currentNoteTimeInBeats))
             return;
 
-        foreach (var note in MapCreator._Map.NoteTimeChunks[CurrentTime])
-        {
+        foreach (var note in MapCreator._Map.NoteTimeChunks[currentNoteTimeInBeats])
             note.gameObject.SetActive(show);
-        }
     }
 
     private void UpdatePrecisionText()
     {
         txtPrecision.text = "Precision: 1/" + Precision;
-    }
-
-    private void UpdateBeatTimeText()
-    {
-        txtBeatTime.text = "Beat: " + Math.Round(CurrentTime, 2);
     }
 
     private double GetBPMInSeconds(int bpm)
