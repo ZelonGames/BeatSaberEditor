@@ -10,7 +10,7 @@ public class MapEditorManager : MonoBehaviour
 {
     #region Fields
 
-    private List<float> timeStamps = new List<float>();
+    public List<double> timeStamps = new List<double>();
     private int currentTimeStampIndex = 0;
 
     [SerializeField]
@@ -35,7 +35,7 @@ public class MapEditorManager : MonoBehaviour
     public double NoteTimer { get; private set; }
     public bool Playing { get; private set; }
 
-    public float CurrentTimeStamp
+    public double CurrentTimeStamp
     {
         get
         {
@@ -147,7 +147,7 @@ public class MapEditorManager : MonoBehaviour
 
         foreach (var notes in MapCreator._Map.NoteTimeChunks.Values)
         {
-            float noteTime = (float)(MapCreator._Map.BeatLenghtInSeconds * notes.First()._time);
+            double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
             timeStamps.Add(noteTime);
         }
     }
@@ -185,8 +185,11 @@ public class MapEditorManager : MonoBehaviour
         if (!MapCreator._Map.NoteTimeChunks.ContainsKey(BeatCounter))
             return;
 
-        foreach (var notes in MapCreator._Map.NoteTimeChunks[beat])
+        List<Note> noteChunk = MapCreator._Map.NoteTimeChunks[beat];
+        foreach (var notes in noteChunk)
             notes.gameObject.SetActive(show);
+
+        currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(noteChunk);
     }
 
     public void UpdateNoteTimerAfterPlaying(double currentBeat)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -81,7 +82,9 @@ public class CutDirectionButton : MonoBehaviour
     public void AddNote()
     {
         notePlacer = GameObject.FindGameObjectWithTag("NotePlacer");
-        MapCreator._Map.AddNote(notePrefab, null, arrowCubeBluePrefab, arrowCubeRedPrefab, _CutDirection, tileParent.Coordinate, MapEditorManager.Instance.BeatCounter, MapEditorManager.Instance.ItemType, true);
+        Note note = MapCreator._Map.AddNote(notePrefab, null, arrowCubeBluePrefab, arrowCubeRedPrefab, _CutDirection, tileParent.Coordinate, MapEditorManager.Instance.BeatCounter, MapEditorManager.Instance.ItemType, true);
+        MapEditorManager.Instance.timeStamps.Add(MapCreator._Map.BeatLenghtInSeconds * note._time);
+        MapEditorManager.Instance.timeStamps = MapEditorManager.Instance.timeStamps.OrderBy(x => x).ToList();
         notePlacer.SetActive(false);
     }
 }
