@@ -303,6 +303,16 @@ public class MapCreator : MonoBehaviour
         _Map = new Map(jsonMap._version, jsonMap._beatsPerMinute, jsonMap._beatsPerBar, jsonMap._noteJumpSpeed, jsonMap._notesObjects);
     }
 
+    public void OnUnloadMap()
+    {
+        _Map = null;
+    }
+
+    public void OnUnloadMapInfo()
+    {
+        _MapInfo = null;
+    }
+
     public string MapFolderPath(string songName)
     {
         return Application.persistentDataPath + "/CustomSongs/" + songName;

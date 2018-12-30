@@ -483,6 +483,17 @@ MonoBehaviour:
           m_StringArgument: CreateMapScene
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1374310253}
+        m_MethodName: OnUnloadMap
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &392060032
@@ -612,6 +623,17 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 11500000, guid: 39a33d9ca3684634eb1ea7c3d1df6d6a, type: 3}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2212,6 +2234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e732fe61d0e221b4ea965091ea9ea481, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeStamps: []
   timeline: {fileID: 0}
   txtPrecision: {fileID: 0}
   txtBeatTime: {fileID: 0}
