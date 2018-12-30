@@ -78,7 +78,7 @@ public class _3DGridGenerator : MonoBehaviour
     {
         int beat = 0;
         GameObject lineType = null;
-        for (int i = 0; i < MapCreator._Map.AmountOfBeatsInSong() * 4; i++)
+        for (int i = 0; i < MapCreator._Map.GetAmountOfBeatsInSong() * 4; i++)
         {
             lineType = i % 4 == 0 ? bigLine : smallLine;
             InstantiateLine(lineType, new Vector2(0, yPos));

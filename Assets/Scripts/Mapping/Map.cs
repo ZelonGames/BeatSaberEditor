@@ -118,7 +118,7 @@ public class Map
         return note;
     }
 
-    public double AmountOfBeatsInSong()
+    public double GetAmountOfBeatsInSong()
     {
         return MusicPlayer.Instance.MusicLengthInSeconds() / BeatLenghtInSeconds;
     }

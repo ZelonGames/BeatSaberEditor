@@ -20,6 +20,12 @@ public class MapEditorManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
 
+    private List<Note> showedNotes = null;
+
+    public readonly int maxPrecision = 64;
+
+    public delegate void UpdateNextAndPrevNote();
+
     #endregion
 
     #region Properties
@@ -27,7 +33,6 @@ public class MapEditorManager : MonoBehaviour
     public Note.ItemType ItemType { get; private set; }
     public int Precision { get; private set; }
     public double NoteTimer { get; private set; }
-    private double bpmInSeconds;
     public bool Playing { get; private set; }
 
     public float CurrentTimeStamp
@@ -38,13 +43,7 @@ public class MapEditorManager : MonoBehaviour
         }
     }
 
-    public double CurrentNoteTimeInBeats
-    {
-        get
-        {
-            return NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60d;
-        }
-    }
+    public double BeatCounter { get; private set; }
 
     public static MapEditorManager Instance { get; private set; }
 
@@ -57,8 +56,6 @@ public class MapEditorManager : MonoBehaviour
         Instance = this;
         ItemType = Note.ItemType.Blue;
         Precision = 1;
-
-        bpmInSeconds = GetBPMInSeconds(MapCreator._Map._beatsPerMinute);
         GetTimeStamps();
     }
 
@@ -70,8 +67,8 @@ public class MapEditorManager : MonoBehaviour
 
             if (NoteTimer >= CurrentTimeStamp)
             {
-                ShowHideNotes(false, currentTimeStampIndex - 1);
-                ShowHideNotes(true, currentTimeStampIndex);
+                HideShowedNotes();
+                ShowNotes(currentTimeStampIndex);
                 SetNextTimeStamp();
             }
 
@@ -80,9 +77,41 @@ public class MapEditorManager : MonoBehaviour
         }
     }
 
+    public void OnChangeTime(bool forward)
+    {
+        float beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
+
+        ShowHideNotes(false, BeatCounter);
+
+        if (forward)
+        {
+            NoteTimer += beatLengthInSeconds / Precision;
+            BeatCounter += 1d / Precision;
+        }
+        else
+        {
+            NoteTimer -= beatLengthInSeconds / Precision;
+            BeatCounter -= 1d / Precision;
+        }
+
+        ShowHideNotes(true, BeatCounter);
+    }
+
     public void OnPlay()
     {
         Playing = !Playing;
+
+        if (!Playing)
+        {
+            BeatCounter = GetBeatTimeAfterPlaying();
+            UpdateNoteTimerAfterPlaying(BeatCounter);
+            PlayTween.Instance.StopMoving();
+
+            HideShowedNotes();
+            ShowHideNotes(true, BeatCounter);
+        }
+        else
+            ShowHideNotes(false, BeatCounter);
     }
 
     public void OnBlueArrowSelected()
@@ -118,7 +147,7 @@ public class MapEditorManager : MonoBehaviour
 
         foreach (var notes in MapCreator._Map.NoteTimeChunks.Values)
         {
-            float noteTime = (float)(bpmInSeconds * notes.First()._time);
+            float noteTime = (float)(MapCreator._Map.BeatLenghtInSeconds * notes.First()._time);
             timeStamps.Add(noteTime);
         }
     }
@@ -128,47 +157,54 @@ public class MapEditorManager : MonoBehaviour
         Precision = value;
     }
 
-    public void ChangeTime(bool forward)
+    private void ShowNotes(int index)
     {
-        ShowHideNotes(false, currentTimeStampIndex);
-        ShowHideNotes(false);
-
-        if (forward)
-            NoteTimer += (float)bpmInSeconds / Precision;
-        else
-            NoteTimer -= (float)bpmInSeconds / Precision;
-
-        ShowHideNotes(true);
-    }
-
-    public void ShowHideNotes(bool show, int index)
-    {
-        if (index < 0)
+        if (index < 0 || index > MapCreator._Map.NoteTimeChunks.Count - 1)
             return;
 
-        foreach (var note in MapCreator._Map.NoteTimeChunks.Values[index])
-            note.gameObject.SetActive(show);
+        List<Note> notes = MapCreator._Map.NoteTimeChunks.Values[index];
+
+        foreach (var note in notes)
+            note.gameObject.SetActive(true);
+
+        showedNotes = notes;
+        currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(showedNotes);
     }
 
-    public void ShowHideNotes(bool show)
+    private void HideShowedNotes()
     {
-        var currentNoteTimeInBeats = CurrentNoteTimeInBeats;
-
-        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(currentNoteTimeInBeats))
+        if (showedNotes == null)
             return;
 
-        foreach (var note in MapCreator._Map.NoteTimeChunks[currentNoteTimeInBeats])
-            note.gameObject.SetActive(show);
+        foreach (var note in showedNotes)
+            note.gameObject.SetActive(false);
     }
 
-    private void UpdatePrecisionText()
+    private void ShowHideNotes(bool show, double beat)
     {
-        txtPrecision.text = "Precision: 1/" + Precision;
+        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(BeatCounter))
+            return;
+
+        foreach (var notes in MapCreator._Map.NoteTimeChunks[beat])
+            notes.gameObject.SetActive(show);
     }
 
-    private double GetBPMInSeconds(int bpm)
+    public void UpdateNoteTimerAfterPlaying(double currentBeat)
     {
-        return 60d / bpm;
+        NoteTimer = MapCreator._Map.BeatLenghtInSeconds * currentBeat;
+    }
+
+    public double GetCurrentNoteTimeInBeats()
+    {
+        return NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f;
+    }
+
+    public double GetBeatTimeAfterPlaying()
+    {
+        double precisionValue = 1d / Precision;
+        int multiplier = (int)(GetCurrentNoteTimeInBeats() / precisionValue);
+
+        return (double)multiplier / Precision;
     }
 
     #endregion

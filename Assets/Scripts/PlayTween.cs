@@ -6,6 +6,8 @@ public class PlayTween : MonoBehaviour
 {
     public static PlayTween Instance { get; private set; }
 
+    private int distance = 800;
+
     private void Awake()
     {
         Instance = this;
@@ -18,10 +20,12 @@ public class PlayTween : MonoBehaviour
 
     public void Move()
     {
-        var destination = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, (float)_3DGridGenerator.Instance.GetBeatPosition(MapCreator._Map.AmountOfBeatsInSong()));
+        var destination = GetBeatPosition(MapCreator._Map.GetAmountOfBeatsInSong());
 
         if (MapEditorManager.Instance.Playing)
-            iTween.MoveTo(gameObject, iTween.Hash("position", destination, "time", MusicPlayer.Instance.MusicLengthInSeconds(), "easetype", iTween.EaseType.linear));
+            iTween.MoveTo(gameObject, iTween.Hash("position", destination, "time",
+                MusicPlayer.Instance.MusicLengthInSeconds() - MapCreator._Map.BeatLenghtInSeconds * MapEditorManager.Instance.BeatCounter, 
+                "easetype", iTween.EaseType.linear));
     }
 
     public void StopMoving()
@@ -37,6 +41,13 @@ public class PlayTween : MonoBehaviour
 
     private Vector3 GetBeatPosition()
     {
-        return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.CurrentNoteTimeInBeats) - 800);
+        return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 
+            (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.GetCurrentNoteTimeInBeats()) - distance);
+    }
+
+    private Vector3 GetBeatPosition(double beat)
+    {
+        return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 
+            (float)_3DGridGenerator.Instance.GetBeatPosition(beat) - distance);
     }
 }

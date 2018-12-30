@@ -27,6 +27,7 @@ public class btnPlay : MonoBehaviour
         mapeditorManager.OnPlay();
         musicPlayer.ToggleSong();
         UpdateSprite();
+        PlayTween.Instance.Move();
     }
 
     private void UpdateSprite()

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class ItemButton : MonoBehaviour
 {
     private Filebrowser filebrowser;
-    
+
     [HideInInspector]
     public string path;
 
@@ -67,27 +67,18 @@ public class ItemButton : MonoBehaviour
         if (!(filebrowser.browseCustomSongs || isFile))
             return;
 
-        string message = "";
         if (isFile)
-            message = "Are you sure you want to delete this file?";
+            File.Delete(path);
         else if (filebrowser.browseCustomSongs)
-            message = "Are you sure you want to delete this map?";
-
-        //if (EditorUtility.DisplayDialog("", message, "Yes", "No"))
         {
-            if (isFile)
-                File.Delete(path);
-            else if (filebrowser.browseCustomSongs)
-            {
-                string[] files = Directory.GetFiles(path);
-                foreach (var file in files)
-                    File.Delete(file);
+            string[] files = Directory.GetFiles(path);
+            foreach (var file in files)
+                File.Delete(file);
 
-                Directory.Delete(path);
-            }
-
-            GameObject.Destroy(gameObject);
+            Directory.Delete(path);
         }
+
+        GameObject.Destroy(gameObject);
     }
 
     public void ShowNewDirectories(string path)
