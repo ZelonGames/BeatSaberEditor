@@ -20,7 +20,7 @@ public class MapEditorManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
 
-    private List<Note> showedNotes = null;
+    public List<Note> ShowedNotes { get; private set; }
 
     public readonly int maxPrecision = 64;
 
@@ -167,27 +167,30 @@ public class MapEditorManager : MonoBehaviour
         foreach (var note in notes)
             note.gameObject.SetActive(true);
 
-        showedNotes = notes;
-        currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(showedNotes);
+        ShowedNotes = notes;
+        currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(ShowedNotes);
     }
 
     private void HideShowedNotes()
     {
-        if (showedNotes == null)
+        if (ShowedNotes == null)
             return;
 
-        foreach (var note in showedNotes)
+        foreach (var note in ShowedNotes)
             note.gameObject.SetActive(false);
     }
 
     private void ShowHideNotes(bool show, double beat)
     {
-        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(BeatCounter))
+        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(beat))
             return;
 
         List<Note> noteChunk = MapCreator._Map.NoteTimeChunks[beat];
         foreach (var notes in noteChunk)
             notes.gameObject.SetActive(show);
+
+        if (show)
+            ShowedNotes = noteChunk;
 
         currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(noteChunk);
     }
