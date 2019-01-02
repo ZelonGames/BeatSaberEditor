@@ -68,9 +68,12 @@ public class Filebrowser : MonoBehaviour
     [SerializeField]
     private Canvas canvas;
     [SerializeField]
-    private GameObject scrollView;
+    private GameObject scrollViewContent;
     [SerializeField]
     private GameObject itemButtonPrefab;
+    [SerializeField]
+    private TextMeshProUGUI txtTitle;
+
     private string[] files;
     private string[] folders;
 
@@ -103,12 +106,27 @@ public class Filebrowser : MonoBehaviour
     {
         if (browseCustomSongs)
             pathType = PathType.Folder;
+
+        switch (pathType)
+        {
+            case PathType.ImageFile:
+                txtTitle.text = "Select Image";
+                break;
+            case PathType.AudioFile:
+                txtTitle.text = "Select Song";
+                break;
+            case PathType.Folder:
+                txtTitle.text = "Song List";
+                break;
+            default:
+                break;
+        }
         CreateCustomSongsPath();
 
         currentPath = browseCustomSongs ? CustomSongsPath : "/";
         paths.Add(currentPath);
         canvasRect = canvas.GetComponent<RectTransform>().rect;
-        scrollViewRect = scrollView.GetComponent<RectTransform>().rect;
+        scrollViewRect = scrollViewContent.GetComponent<RectTransform>().rect;
         ShowDirectoriesAndFiles(currentPath);
     }
 
@@ -162,7 +180,10 @@ public class Filebrowser : MonoBehaviour
     private void InstantiateItemButton(string path, bool file = false)
     {
         GameObject button = Instantiate(itemButtonPrefab);
-        button.transform.SetParent(scrollView.transform);
+        button.transform.SetParent(scrollViewContent.transform);
+
+        var buttonRect = button.GetComponent<RectTransform>();
+        buttonRect.sizeDelta = new Vector2(scrollViewRect.width, buttonRect.rect.height);
 
         ItemButton item = button.GetComponentInChildren<ItemButton>();
         item.path = path;
@@ -171,10 +192,12 @@ public class Filebrowser : MonoBehaviour
         var folders = path.Split('/');
         btnText.text = path.Split('/').Last().Split('\\').Last();
 
+        button.tag = "Directory";
+
         if (file)
         {
             item.isFile = true;
-            button.GetComponentInChildren<Image>().color = new Color(0.2f, 0.2f, 0.2f);
+            //button.GetComponentInChildren<Image>().color = new Color(0.2f, 0.2f, 0.2f);
             btnText.color = Color.white;
         }
     }

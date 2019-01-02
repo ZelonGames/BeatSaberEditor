@@ -168,10 +168,16 @@ public class MapCreator : MonoBehaviour
     {
         if (mapData.songName != null)
             inputSongName.text = mapData.songName;
+        else
+            inputSongName.text = "";
         if (mapData.songSubname != null)
             inputSongSubname.text = mapData.songSubname;
+        else
+            inputSongSubname.text = "";
         if (mapData.authorName != null)
             inputAuthorName.text = mapData.authorName;
+        else
+            inputAuthorName.text = "";
         if (mapData.bpm.HasValue)
             inputBPM.text = mapData.bpm.Value.ToString();
         if (mapData.difficultyValue.HasValue)
@@ -311,6 +317,13 @@ public class MapCreator : MonoBehaviour
     public void OnUnloadMapInfo()
     {
         _MapInfo = null;
+    }
+
+    public void OnUnloadMapData()
+    {
+        mapData = new MapData();
+        SetStandardMapInfo();
+        SetInputFieldsToMapData();
     }
 
     public string MapFolderPath(string songName)
