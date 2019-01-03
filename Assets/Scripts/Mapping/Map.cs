@@ -64,9 +64,11 @@ public class Map
         _notesObjects.Remove(note);
         NoteTimeChunks[note._time].Remove(note);
         if (NoteTimeChunks[note._time].Count == 0)
+        {
             NoteTimeChunks.Remove(note._time);
-
-        MapEditorManager.Instance.timeStamps.RemoveAt(timeStampIndex);
+            MapEditorManager.Instance.ShowHideNotes(false, note._time);
+            MapEditorManager.Instance.timeStamps.RemoveAt(timeStampIndex);
+        }
 
         GameObject.Destroy(note.arrowCube);
         GameObject.Destroy(note.gameObject);
@@ -79,7 +81,7 @@ public class Map
         if (_notesObjects != null)
             _notesObjects.Clear();
     }
-    
+
     public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
     {
         if (!NoteTimeChunks.ContainsKey(time))
