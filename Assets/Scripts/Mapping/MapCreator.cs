@@ -80,6 +80,8 @@ public class MapCreator : MonoBehaviour
 
     #endregion
 
+    #region Events
+
     private void Awake()
     {
         Instance = this;
@@ -91,7 +93,8 @@ public class MapCreator : MonoBehaviour
     {
         if (currentSceneName == "CreateMapScene")
         {
-            MapLoader.GetMapInfo(Filebrowser.folder.FileName);
+            if (Filebrowser.folder._FilePath != null)
+                MapLoader.GetMapInfo(Filebrowser.folder.FileName);
             if (_MapInfo != null)
                 MapLoader.GetJsonMap(_MapInfo.songName, _MapInfo.difficultyLevels.First().difficulty);
 
@@ -123,6 +126,81 @@ public class MapCreator : MonoBehaviour
         }
     }
 
+    public void OnCreateMap()
+    {
+        if (_MapInfo == null)
+            _MapInfo = new MapInfo(mapData.songName, mapData.songSubname, mapData.authorName, mapData.bpm.Value, 12, 12, "cover.jpg", "DefaultEnvironment", false, new List<DifficultyLevel> { new DifficultyLevel(selectedDifficultyName, 1, "song.ogg", selectedDifficultyName + ".json", 0, 0), });
+
+        if (_Map == null)
+            MapLoader.GetJsonMap(_MapInfo.songName, selectedDifficultyName);
+        if (_Map == null)
+            _Map = new Map("1.1", mapData.bpm.Value, 16, mapData.noteJumpSpeed.Value, new List<Note>());
+
+        string mapFolderPath = MapFolderPath(mapData.songName);
+
+        if (!Directory.Exists(mapFolderPath))
+        {
+            Directory.CreateDirectory(mapFolderPath);
+            if (Filebrowser.image.HasSelectedFile)
+                File.Copy(Filebrowser.image.NormalPath, mapFolderPath + "/cover.jpg", true);
+            if (Filebrowser.audio.HasSelectedFile)
+                File.Copy(Filebrowser.audio.NormalPath, mapFolderPath + "/song.ogg", true);
+        }
+
+        DifficultyLevel selectedDifficulty = _MapInfo.GetDifficulty(selectedDifficultyName);
+        if (selectedDifficulty == null)
+        {
+            DifficultyLevel lastLevel = _MapInfo.difficultyLevels.Last();
+            selectedDifficulty = new DifficultyLevel(selectedDifficultyName, lastLevel.difficultyRank, lastLevel.audioPath, lastLevel.jsonPath, lastLevel.offset, lastLevel.oldOffset);
+            _MapInfo.difficultyLevels.Add(selectedDifficulty);
+            if (_Map != null)
+                _Map.ClearNotes();
+        }
+
+        _MapInfo.currentDifficulty = selectedDifficulty;
+        _MapInfo.currentDifficulty.offset = mapData.startOffset.Value;
+        _Map._noteJumpSpeed = mapData.noteJumpSpeed.Value;
+
+        SaveInfo();
+        mapData.ResetAll();
+    }
+
+    public void OnUpdateMapData()
+    {
+        mapData.songName = inputSongName.text;
+        mapData.songSubname = inputSongSubname.text;
+        mapData.authorName = inputAuthorName.text;
+        mapData.bpm = Convert.ToInt32(inputBPM.text);
+        mapData.difficultyValue = dropdownDifficulty.value;
+        mapData.startOffset = Convert.ToInt32(inputStartOffset.text);
+        mapData.noteJumpSpeed = Convert.ToInt32(inputNoteJumpSpeed.text);
+
+        selectedDifficultyName = GetSelectedDifficultyName();
+    }
+
+    public void OnUnloadMap()
+    {
+        _Map = null;
+    }
+
+    public void OnUnloadMapInfo()
+    {
+        _MapInfo = null;
+    }
+
+    public void OnUnloadMapData()
+    {
+        mapData = new MapData();
+        SetStandardMapInfo();
+        SetInputFieldsToMapData();
+
+        Filebrowser.folder.ResetPath();
+        Filebrowser.image.ResetPath();
+        Filebrowser.audio.ResetPath();
+    }
+
+    #endregion
+
     #region MapData
 
     private void SetStandardMapInfo()
@@ -138,22 +216,9 @@ public class MapCreator : MonoBehaviour
             mapData.songSubname = _MapInfo.songSubName;
             mapData.authorName = _MapInfo.songAuthorName;
             mapData.bpm = _MapInfo.beatsPerMinute;
-            
+
             UpdateDifficultyData();
         }
-    }
-
-    public void UpdateMapData()
-    {
-        mapData.songName = inputSongName.text;
-        mapData.songSubname = inputSongSubname.text;
-        mapData.authorName = inputAuthorName.text;
-        mapData.bpm = Convert.ToInt32(inputBPM.text);
-        mapData.difficultyValue = dropdownDifficulty.value;
-        mapData.startOffset = Convert.ToInt32(inputStartOffset.text);
-        mapData.noteJumpSpeed = Convert.ToInt32(inputNoteJumpSpeed.text);
-
-        selectedDifficultyName = GetSelectedDifficultyName();
     }
 
     private void SetInputFieldsToMapData()
@@ -213,7 +278,7 @@ public class MapCreator : MonoBehaviour
     }
 
     #endregion
-
+    
     public void SaveInfo()
     {
         jsonInfo = JsonConvert.SerializeObject(_MapInfo);
@@ -249,45 +314,6 @@ public class MapCreator : MonoBehaviour
         jsonMap = JsonConvert.SerializeObject(_Map);
     }
 
-    public void OnCreateMap()
-    {
-        if (_MapInfo == null)
-            _MapInfo = new MapInfo(mapData.songName, mapData.songSubname, mapData.authorName, mapData.bpm.Value, 12, 12, "cover.jpg", "DefaultEnvironment", false, new List<DifficultyLevel> { new DifficultyLevel(selectedDifficultyName, 1, "song.ogg", selectedDifficultyName + ".json", 0, 0), });
-
-        if (_Map == null)
-            MapLoader.GetJsonMap(_MapInfo.songName, selectedDifficultyName);
-        if (_Map == null)
-            _Map = new Map("1.1", mapData.bpm.Value, 16, mapData.noteJumpSpeed.Value, new List<Note>());
-
-        string mapFolderPath = MapFolderPath(mapData.songName);
-
-        if (!Directory.Exists(mapFolderPath))
-        {
-            Directory.CreateDirectory(mapFolderPath);
-            if (Filebrowser.image.HasSelectedFile)
-                File.Copy(Filebrowser.image.NormalPath, mapFolderPath + "/cover.jpg", true);
-            if (Filebrowser.audio.HasSelectedFile)
-                File.Copy(Filebrowser.audio.NormalPath, mapFolderPath + "/song.ogg", true);
-        }
-
-        DifficultyLevel selectedDifficulty = _MapInfo.GetDifficulty(selectedDifficultyName);
-        if (selectedDifficulty == null)
-        {
-            DifficultyLevel lastLevel = _MapInfo.difficultyLevels.Last();
-            selectedDifficulty = new DifficultyLevel(selectedDifficultyName, lastLevel.difficultyRank, lastLevel.audioPath, lastLevel.jsonPath, lastLevel.offset, lastLevel.oldOffset);
-            _MapInfo.difficultyLevels.Add(selectedDifficulty);
-            if (_Map != null)
-                _Map.ClearNotes();
-        }
-
-        _MapInfo.currentDifficulty = selectedDifficulty;
-        _MapInfo.currentDifficulty.offset = mapData.startOffset.Value;
-        _Map._noteJumpSpeed = mapData.noteJumpSpeed.Value;
-
-        SaveInfo();
-        mapData.ResetAll();
-    }
-
     private void UpdateMapInfo(MapInfo mapInfo)
     {
         _MapInfo = new MapInfo(mapInfo.songName, mapInfo.songSubName, mapInfo.songAuthorName, mapInfo.beatsPerMinute, mapInfo.previewDuration, mapInfo.previewStartTime, mapInfo.coverImagePath, mapInfo.environmentName, mapInfo.oneSaber, mapInfo.difficultyLevels);
@@ -296,23 +322,6 @@ public class MapCreator : MonoBehaviour
     private void UpdateMap(Map jsonMap)
     {
         _Map = new Map(jsonMap._version, jsonMap._beatsPerMinute, jsonMap._beatsPerBar, jsonMap._noteJumpSpeed, jsonMap._notesObjects);
-    }
-
-    public void OnUnloadMap()
-    {
-        _Map = null;
-    }
-
-    public void OnUnloadMapInfo()
-    {
-        _MapInfo = null;
-    }
-
-    public void OnUnloadMapData()
-    {
-        mapData = new MapData();
-        SetStandardMapInfo();
-        SetInputFieldsToMapData();
     }
 
     public string MapFolderPath(string songName)

@@ -25,18 +25,17 @@ public static class MapLoader
 
         string json = File.ReadAllText(file);
         MapCreator._Map = JsonConvert.DeserializeObject<Map>(json);
-        MapCreator._Map._notes = new List<JsonNote>();
-        foreach(var note in MapCreator._Map._notesObjects)
-            MapCreator._Map._notes.Add(new JsonNote(note._time, note._lineIndex, note._lineLayer, (Note.ItemType)note._type, (Note.CutDirection)note._cutDirection));
 
-        MapCreator._Map._notesObjects.Clear();
         return MapCreator._Map;
     }
 
     public static void LoadMap(Note notePrefab, GameObject bombPrefab, GameObject blueCubePrefab, GameObject redCubePrefab)
     {
-        if (MapCreator._Map._notes == null)
-            return;
+        MapCreator._Map._notes = new List<JsonNote>();
+        foreach (var note in MapCreator._Map._notesObjects)
+            MapCreator._Map._notes.Add(new JsonNote(note._time, note._lineIndex, note._lineLayer, (Note.ItemType)note._type, (Note.CutDirection)note._cutDirection));
+
+        MapCreator._Map._notesObjects.Clear();
 
         foreach (var note in MapCreator._Map._notes)
             MapCreator._Map.AddNote(notePrefab, bombPrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int(note._lineIndex, note._lineLayer), note._time, (Note.ItemType)note._type, false);

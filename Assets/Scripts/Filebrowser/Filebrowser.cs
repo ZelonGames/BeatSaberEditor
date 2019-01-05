@@ -49,7 +49,7 @@ public class Filebrowser : MonoBehaviour
             _FilePath = "file://" + path;
         }
 
-        public void Reset()
+        public void ResetPath()
         {
             _FilePath = null;
         }
