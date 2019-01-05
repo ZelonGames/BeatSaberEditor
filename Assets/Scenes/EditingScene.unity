@@ -392,6 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fd53c5efaf9e6444be67da79ef2d420, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadingScreen: 0
 --- !u!1 &494359248
 GameObject:
   m_ObjectHideFlags: 0
@@ -2005,6 +2006,7 @@ MonoBehaviour:
     type: 2}
   bombSpherePrefab: {fileID: 1079108629358156, guid: fc51e373af6b18d48801ccd09d57450a,
     type: 2}
+  currentSceneName: EditingScene
 --- !u!4 &1374310254
 Transform:
   m_ObjectHideFlags: 0

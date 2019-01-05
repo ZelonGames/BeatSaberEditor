@@ -35,16 +35,15 @@ public class ItemButton : MonoBehaviour
                 default:
                     break;
             }
-            SceneManager.LoadScene("CreateMapScene");
+            LoadingScreen.sceneToLoad = "CreateMapScene";
+            SceneManager.LoadScene("LoadingScene");
             return;
         }
         else if (Filebrowser.pathType == Filebrowser.PathType.Folder)
         {
             Filebrowser.folder.SetPath(path);
-            MapLoader.GetMapInfo(Filebrowser.folder.FileName);
-            if (MapCreator._MapInfo != null)
-                MapLoader.GetJsonMap(MapCreator._MapInfo.songName, MapCreator._MapInfo.difficultyLevels.First().difficulty);
-            SceneManager.LoadScene("CreateMapScene");
+            LoadingScreen.sceneToLoad = "CreateMapScene";
+            SceneManager.LoadScene("LoadingScene");
         }
         else
         {
