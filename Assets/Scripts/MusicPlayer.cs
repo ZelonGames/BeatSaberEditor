@@ -30,6 +30,10 @@ public class MusicPlayer : MonoBehaviour
     {
         Instance = this;
 
+    }
+
+    private void Start()
+    {
         StartCoroutine(LoadAudio());
     }
 
