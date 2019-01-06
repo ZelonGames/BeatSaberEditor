@@ -29,7 +29,6 @@ public class MusicPlayer : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-
     }
 
     private void Start()

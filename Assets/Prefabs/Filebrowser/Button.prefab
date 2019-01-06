@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 114732773020603356}
   - component: {fileID: 114126870842530808}
   - component: {fileID: 114224452462012242}
+  - component: {fileID: 114655179714024860}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -429,6 +430,34 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &114655179714024860
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1269740789914974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712da1120d83f4e43bc478da50b397b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  durationThreshold: 1
+  onLongPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 114732773020603356}
+        m_MethodName: Delete
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114732773020603356
 MonoBehaviour:
   m_ObjectHideFlags: 1
