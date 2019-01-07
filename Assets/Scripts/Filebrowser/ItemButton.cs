@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 
 public class ItemButton : MonoBehaviour
 {
+    private Filebrowser.Path pathHelper = new Filebrowser.Path();
+
     private Filebrowser filebrowser;
 
     [HideInInspector]
@@ -66,7 +68,16 @@ public class ItemButton : MonoBehaviour
         if (!(isFile || filebrowser.browseCustomSongs))
             return;
 
-        var dialogBox = CustomDIalogBox.Show("Delete Item", "Are you sure you want to delete this item?");
+        pathHelper.SetPath(path);
+
+        CustomDIalogBox dialogBox = null;
+
+        if (isFile)
+            dialogBox = CustomDIalogBox.Show(pathHelper.FileName, 
+                "Are you sure you want to delete the file: " + "\"" + pathHelper.FileName + "\"?");
+        else if (filebrowser.browseCustomSongs)
+            dialogBox = CustomDIalogBox.Show(pathHelper.FileName, 
+                "Are you sure you want to delete the map: " + "\"" + pathHelper.FileName + "\"?");
 
         StartCoroutine(WaitForAnswer(dialogBox));
     }

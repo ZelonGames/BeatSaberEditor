@@ -197,7 +197,6 @@ public class Filebrowser : MonoBehaviour
         if (file)
         {
             item.isFile = true;
-            //button.GetComponentInChildren<Image>().color = new Color(0.2f, 0.2f, 0.2f);
             btnText.color = Color.white;
         }
     }
