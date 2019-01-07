@@ -84,10 +84,10 @@ public class ItemButton : MonoBehaviour
 
     private IEnumerator WaitForAnswer(CustomDIalogBox dialogBox)
     {
-        while (dialogBox.Answer == CustomDIalogBox.AnswerState.Thinking)
+        while (dialogBox.Answer.Equals(CustomDIalogBox.AnswerState.Thinking))
             yield return null;
 
-        if (dialogBox.Answer == CustomDIalogBox.AnswerState.Yes)
+        if (dialogBox.Answer.Equals(CustomDIalogBox.AnswerState.Yes))
         {
             if (isFile)
                 File.Delete(path);
