@@ -66,7 +66,7 @@ public class ItemButton : MonoBehaviour
         if (!(isFile || filebrowser.browseCustomSongs))
             return;
 
-        var dialogBox = CustomDIalogBox.Show("Delete File", "Are you sure you want to delete this file?");
+        var dialogBox = CustomDIalogBox.Show("Delete Item", "Are you sure you want to delete this item?");
 
         StartCoroutine(WaitForAnswer(dialogBox));
     }
