@@ -2,9 +2,13 @@
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Collections;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class LongPressEventTrigger : UIBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
 {
+    private Button button;
+
     [SerializeField]
     private float durationThreshold = 1.0f;
 
@@ -15,6 +19,11 @@ public class LongPressEventTrigger : UIBehaviour, IPointerDownHandler, IPointerU
     private bool longPressTriggered = false;
     private float timePressStarted;
 
+    private void Start()
+    {
+        button = gameObject.GetComponent<Button>();
+    }
+
     private void Update()
     {
         if (isPointerDown && !longPressTriggered)
@@ -22,6 +31,7 @@ public class LongPressEventTrigger : UIBehaviour, IPointerDownHandler, IPointerU
             if (Time.time - timePressStarted > durationThreshold)
             {
                 longPressTriggered = true;
+                button.enabled = false;
                 onLongPress.Invoke();
             }
         }
@@ -43,5 +53,6 @@ public class LongPressEventTrigger : UIBehaviour, IPointerDownHandler, IPointerU
     public void OnPointerExit(PointerEventData eventData)
     {
         isPointerDown = false;
+        button.enabled = true;
     }
 }

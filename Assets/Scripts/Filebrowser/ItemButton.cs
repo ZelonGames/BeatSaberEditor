@@ -63,21 +63,34 @@ public class ItemButton : MonoBehaviour
 
     public void Delete()
     {
-        if (!(filebrowser.browseCustomSongs || isFile))
+        if (!(isFile || filebrowser.browseCustomSongs))
             return;
 
-        if (isFile)
-            File.Delete(path);
-        else if (filebrowser.browseCustomSongs)
+        var dialogBox = CustomDIalogBox.Show("Delete File", "Are you sure you want to delete this file?");
+
+        StartCoroutine(WaitForAnswer(dialogBox));
+    }
+
+    private IEnumerator WaitForAnswer(CustomDIalogBox dialogBox)
+    {
+        while (dialogBox.Answer == CustomDIalogBox.AnswerState.Thinking)
+            yield return null;
+
+        if (dialogBox.Answer == CustomDIalogBox.AnswerState.Yes)
         {
-            string[] files = Directory.GetFiles(path);
-            foreach (var file in files)
-                File.Delete(file);
+            if (isFile)
+                File.Delete(path);
+            else if (filebrowser.browseCustomSongs)
+            {
+                string[] files = Directory.GetFiles(path);
+                foreach (var file in files)
+                    File.Delete(file);
 
-            Directory.Delete(path);
+                Directory.Delete(path);
+            }
+
+            GameObject.Destroy(gameObject);
         }
-
-        GameObject.Destroy(gameObject);
     }
 
     public void ShowNewDirectories(string path)
