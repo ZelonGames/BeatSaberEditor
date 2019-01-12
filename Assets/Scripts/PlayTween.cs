@@ -34,9 +34,9 @@ public class PlayTween : MonoBehaviour
         gameObject.transform.position = GetBeatPosition();
     }
 
-    public void Step()
+    public void Step(float beat)
     {
-        gameObject.transform.position = GetBeatPosition();
+        gameObject.transform.position = GetBeatPosition(beat);
     }
 
     private Vector3 GetBeatPosition()

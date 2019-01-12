@@ -94,6 +94,20 @@ public class MapEditorManager : MonoBehaviour
             BeatCounter -= 1d / Precision;
         }
 
+        TimelineSlider.Instance.UpdateSliderTime((float)BeatCounter);
+
+        ShowHideNotes(true, BeatCounter);
+    }
+
+    public void ChangeTime(double beat)
+    {
+        float beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
+
+        ShowHideNotes(false, BeatCounter);
+
+        NoteTimer = beatLengthInSeconds * beat;
+        BeatCounter = beat;
+
         ShowHideNotes(true, BeatCounter);
     }
 
@@ -103,7 +117,7 @@ public class MapEditorManager : MonoBehaviour
 
         if (!Playing)
         {
-            BeatCounter = GetBeatTimeAfterPlaying();
+            BeatCounter = SnapBeatTimeToPrecision(GetCurrentNoteTimeInBeats(), Precision);
             UpdateNoteTimerAfterPlaying(BeatCounter);
             PlayTween.Instance.StopMoving();
 
@@ -205,12 +219,12 @@ public class MapEditorManager : MonoBehaviour
         return NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f;
     }
 
-    public double GetBeatTimeAfterPlaying()
+    public double SnapBeatTimeToPrecision(double beat, double precision)
     {
-        double precisionValue = 1d / Precision;
-        int multiplier = (int)(GetCurrentNoteTimeInBeats() / precisionValue);
+        double precisionValue = 1d / precision;
+        int multiplier = (int)(beat / precisionValue);
 
-        return (double)multiplier / Precision;
+        return multiplier / precision;
     }
 
     #endregion
