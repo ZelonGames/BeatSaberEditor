@@ -89,5 +89,9 @@ public class CutDirectionButton : MonoBehaviour
 
         MapEditorManager.Instance.timeStamps = MapEditorManager.Instance.timeStamps.OrderBy(x => x).ToList();
         notePlacer.SetActive(false);
+
+        MapEditorManager.Instance.HideNotes(MapEditorManager.Instance.ShowedNotes);
+        MapEditorManager.Instance.ShowedNotes = MapCreator._Map.NotesOnSameTime[note._time];
+        MapEditorManager.Instance.ShowNotes(MapEditorManager.Instance.ShowedNotes);
     }
 }

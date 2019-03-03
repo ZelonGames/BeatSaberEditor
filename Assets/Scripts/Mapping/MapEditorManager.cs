@@ -29,7 +29,7 @@ public class MapEditorManager : MonoBehaviour
 
     #region Properties
 
-    public List<Note> ShowedNotes { get; private set; }
+    public List<Note> ShowedNotes { get; set; }
     public Note.ItemType ItemType { get; private set; }
 
     public double NoteTimer { get; private set; }
@@ -119,10 +119,24 @@ public class MapEditorManager : MonoBehaviour
 
     #region Methods
 
-    private bool ShouldShowNotes(List<Note> notes, double? precision = null)
+    public void ShowNotes(List<Note> notes)
     {
-        double noteTime = precision.HasValue ? notesToShow.First()._time.GetNearestRoundedDown(precision.Value) : notesToShow.First()._time;
-        return CurrentBeat >= noteTime;
+        if (notes == null)
+            return;
+
+        foreach (var note in notes)
+            note.gameObject.SetActive(true);
+
+        ShowedNotes = notes;
+    }
+
+    public void HideNotes(List<Note> notes)
+    {
+        if (notes == null)
+            return;
+
+        foreach (var note in notes)
+            note.gameObject.SetActive(false);
     }
 
     public void ChangeTime(double beat)
@@ -161,26 +175,6 @@ public class MapEditorManager : MonoBehaviour
             double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
             timeStamps.Add(noteTime);
         }
-    }
-
-    private void ShowNotes(List<Note> notes)
-    {
-        if (notes == null)
-            return;
-
-        foreach (var note in notes)
-            note.gameObject.SetActive(true);
-
-        ShowedNotes = notes;
-    }
-
-    private void HideNotes(List<Note> notes)
-    {
-        if (notes == null)
-            return;
-
-        foreach (var note in notes)
-            note.gameObject.SetActive(false);
     }
 
     private List<Note> GetClosestNotes()
@@ -226,6 +220,12 @@ public class MapEditorManager : MonoBehaviour
         int multiplier = (int)(beat / precisionValue);
 
         return multiplier / precision;
+    }
+
+    private bool ShouldShowNotes(List<Note> notes, double? precision = null)
+    {
+        double noteTime = precision.HasValue ? notesToShow.First()._time.GetNearestRoundedDown(precision.Value) : notesToShow.First()._time;
+        return CurrentBeat >= noteTime;
     }
 
     #endregion

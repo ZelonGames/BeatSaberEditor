@@ -59,19 +59,18 @@ public class Map
 
     public void RemoveNote(Note note)
     {
-        /*
-        int timeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(MapEditorManager.Instance.ShowedNotes);
+        int timeStampIndex = MapCreator._Map.NotesOnSameTime.Values.IndexOf(MapEditorManager.Instance.ShowedNotes);
 
         _notesObjects.Remove(note);
-        NoteTimeChunks[note._time].Remove(note);
-        if (NoteTimeChunks[note._time].Count == 0)
+        NotesOnSameTime[note._time].Remove(note);
+        if (NotesOnSameTime[note._time].Count == 0)
         {
-            NoteTimeChunks.Remove(note._time);
+            NotesOnSameTime.Remove(note._time);
             MapEditorManager.Instance.timeStamps.RemoveAt(timeStampIndex);
         }
 
         GameObject.Destroy(note.arrowCube);
-        GameObject.Destroy(note.gameObject);*/
+        GameObject.Destroy(note.gameObject);
     }
 
     public void ClearNotes()
