@@ -7,7 +7,6 @@ public class MusicPlayer : MonoBehaviour
 {
     [SerializeField]
     private AudioSource audioSource;
-    private float? offsetTimer = null;
 
     public float MusicLengthInSeconds()
     {
@@ -36,17 +35,6 @@ public class MusicPlayer : MonoBehaviour
         StartCoroutine(LoadAudio());
     }
 
-    private void Update()
-    {
-        if (offsetTimer.HasValue)
-        {
-            if (offsetTimer > 0)
-                offsetTimer -= Time.deltaTime;
-            else if (IsLoaded && !audioSource.isPlaying)
-                audioSource.Play();
-        }
-    }
-
     private IEnumerator LoadAudio()
     {
         var www = new WWW("file://" + MapCreator.Instance.MapFolderPath(MapCreator._MapInfo.songName) + "/song.ogg");
@@ -57,22 +45,11 @@ public class MusicPlayer : MonoBehaviour
 
     public void ToggleSong()
     {
-        float startTime = (float)MapEditorManager.Instance.NoteTimer + MapCreator._MapInfo.currentDifficulty.offset * 0.001f;
-        audioSource.time = startTime;
-        if (startTime < 0)
-            offsetTimer = -startTime;
-        else
-            offsetTimer = null;
+        audioSource.time = (float)MapEditorManager.Instance.NoteTimer;
 
         if (MapEditorManager.Instance.Playing)
-        {
-            if (!offsetTimer.HasValue)
-                audioSource.Play();
-        }
+            audioSource.Play();
         else
-        {
             audioSource.Stop();
-            offsetTimer = null;
-        }
     }
 }

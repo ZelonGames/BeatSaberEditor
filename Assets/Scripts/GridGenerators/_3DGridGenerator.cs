@@ -55,7 +55,7 @@ public class _3DGridGenerator : MonoBehaviour
 
     public double GetBeatPosition(double beat)
     {
-        return startYPos + distance * beat * 4;
+        return startYPos + distance * beat * 4 + Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
     }
 
     public Vector2 GetCoordinatePosition(Vector2Int coordinate, GameObject cube)
