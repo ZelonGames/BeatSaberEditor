@@ -50,7 +50,7 @@ public class Tile : MonoBehaviour
 
     private void PlaceBombs()
     {
-        MapCreator._Map.AddNote(notePrefab, bombSpherePrefab, arrowCubeBluePrefab, arrowCubeRedPrefab, Note.CutDirection.Up, Coordinate, MapEditorManager.Instance.BeatCounter, MapEditorManager.Instance.ItemType, true);
+        MapCreator._Map.AddNote(notePrefab, bombSpherePrefab, arrowCubeBluePrefab, arrowCubeRedPrefab, Note.CutDirection.Up, Coordinate, MapEditorManager.Instance.CurrentBeat, MapEditorManager.Instance.ItemType, true);
     }
 
     private void PlaceNotes()

@@ -11,7 +11,6 @@ public class MapEditorManager : MonoBehaviour
     #region Fields
 
     public List<double> timeStamps = new List<double>();
-    private int currentTimeStampIndex = 0;
 
     [SerializeField]
     private GameObject timeline;
@@ -20,7 +19,7 @@ public class MapEditorManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
 
-    public List<Note> ShowedNotes { get; set; }
+    private List<Note> notesToShow = null;
 
     public readonly int maxPrecision = 64;
 
@@ -30,20 +29,21 @@ public class MapEditorManager : MonoBehaviour
 
     #region Properties
 
+    public List<Note> ShowedNotes { get; private set; }
     public Note.ItemType ItemType { get; private set; }
-    public int Precision { get; private set; }
-    public double NoteTimer { get; private set; }
-    public bool Playing { get; private set; }
 
-    public double CurrentTimeStamp
+    public double NoteTimer { get; private set; }
+
+    public double CurrentBeat
     {
         get
         {
-            return timeStamps[currentTimeStampIndex];
+            return NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f;
         }
     }
 
-    public double BeatCounter { get; private set; }
+    public int Precision { get; private set; }
+    public bool Playing { get; private set; }
 
     public static MapEditorManager Instance { get; private set; }
 
@@ -56,7 +56,7 @@ public class MapEditorManager : MonoBehaviour
         Instance = this;
         ItemType = Note.ItemType.Blue;
         Precision = 1;
-        GetTimeStamps();
+        LoadTimeStamps();
     }
 
     private void Update()
@@ -65,50 +65,24 @@ public class MapEditorManager : MonoBehaviour
         {
             NoteTimer += Time.deltaTime;
 
-            if (NoteTimer >= CurrentTimeStamp)
+            if (ShouldShowNotes(notesToShow))
             {
-                HideShowedNotes();
-                ShowNotes(currentTimeStampIndex);
-                SetNextTimeStamp();
-            }
+                if (ShowedNotes != null)
+                    HideNotes(ShowedNotes);
 
-            if (currentTimeStampIndex == timeStamps.Count)
-                Playing = false;
+                ShowNotes(notesToShow);
+                notesToShow = GetNextNotes();
+            }
         }
     }
 
     public void OnChangeTime(bool forward)
     {
-        float beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
+        if (Playing)
+            return;
 
-        ShowHideNotes(false, BeatCounter);
-
-        if (forward)
-        {
-            NoteTimer += beatLengthInSeconds / Precision;
-            BeatCounter += 1d / Precision;
-        }
-        else
-        {
-            NoteTimer -= beatLengthInSeconds / Precision;
-            BeatCounter -= 1d / Precision;
-        }
-
-        TimelineSlider.Instance.UpdateSliderTime((float)BeatCounter);
-
-        ShowHideNotes(true, BeatCounter);
-    }
-
-    public void ChangeTime(double beat)
-    {
-        float beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
-
-        ShowHideNotes(false, BeatCounter);
-
-        NoteTimer = beatLengthInSeconds * beat;
-        BeatCounter = beat;
-
-        ShowHideNotes(true, BeatCounter);
+        double jumpLength = 1d / Precision;
+        ChangeTime(CurrentBeat + (forward ? jumpLength : -jumpLength));
     }
 
     public void OnPlay()
@@ -117,15 +91,13 @@ public class MapEditorManager : MonoBehaviour
 
         if (!Playing)
         {
-            BeatCounter = SnapBeatTimeToPrecision(GetCurrentNoteTimeInBeats(), Precision);
-            UpdateNoteTimerAfterPlaying(BeatCounter);
             PlayTween.Instance.StopMoving();
-
-            HideShowedNotes();
-            ShowHideNotes(true, BeatCounter);
+            ChangeTime(GetSnappedPrecisionBeatTime(CurrentBeat, Precision));
         }
         else
-            ShowHideNotes(false, BeatCounter);
+        {
+            notesToShow = GetClosestNotes();
+        }
     }
 
     public void OnBlueArrowSelected()
@@ -147,22 +119,29 @@ public class MapEditorManager : MonoBehaviour
 
     #region Methods
 
-    private void SetNextTimeStamp()
+    private bool ShouldShowNotes(List<Note> notes, double? precision = null)
     {
-        if (currentTimeStampIndex < timeStamps.Count - 1)
-            currentTimeStampIndex++;
+        double noteTime = precision.HasValue ? notesToShow.First()._time.GetNearestRoundedDown(precision.Value) : notesToShow.First()._time;
+        return CurrentBeat >= noteTime;
     }
 
-    private void GetTimeStamps()
+    public void ChangeTime(double beat)
     {
-        timeStamps.Clear();
-        if (MapCreator._Map._notes == null)
-            return;
+        double prevNoteTimer = NoteTimer;
+        double beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
+        NoteTimer = beatLengthInSeconds * beat;
 
-        foreach (var notes in MapCreator._Map.NoteTimeChunks.Values)
+        TimelineSlider.Instance.SnapSliderToPrecision((float)beat);
+        PlayTween.Instance.Step((float)GetSnappedPrecisionBeatTime(beat, Precision));
+
+        notesToShow = GetClosestNotes();
+
+        if (ShouldShowNotes(notesToShow, 1/64d))
         {
-            double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
-            timeStamps.Add(noteTime);
+            if (ShowedNotes != null)
+                HideNotes(ShowedNotes);
+
+            ShowNotes(notesToShow);
         }
     }
 
@@ -171,55 +150,77 @@ public class MapEditorManager : MonoBehaviour
         Precision = value;
     }
 
-    private void ShowNotes(int index)
+    private void LoadTimeStamps()
     {
-        if (index < 0 || index > MapCreator._Map.NoteTimeChunks.Count - 1)
+        timeStamps.Clear();
+        if (MapCreator._Map._notes == null)
             return;
 
-        List<Note> notes = MapCreator._Map.NoteTimeChunks.Values[index];
+        foreach (var notes in MapCreator._Map.NotesOnSameTime.Values)
+        {
+            double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
+            timeStamps.Add(noteTime);
+        }
+    }
+
+    private void ShowNotes(List<Note> notes)
+    {
+        if (notes == null)
+            return;
 
         foreach (var note in notes)
             note.gameObject.SetActive(true);
 
         ShowedNotes = notes;
-        currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(ShowedNotes);
     }
 
-    private void HideShowedNotes()
+    private void HideNotes(List<Note> notes)
     {
-        if (ShowedNotes == null)
+        if (notes == null)
             return;
 
-        foreach (var note in ShowedNotes)
+        foreach (var note in notes)
             note.gameObject.SetActive(false);
     }
 
-    public void ShowHideNotes(bool show, double beat)
+    private List<Note> GetClosestNotes()
     {
-        if (!MapCreator._Map.NoteTimeChunks.ContainsKey(beat))
-            return;
+        var notesOnSameTime = MapCreator._Map.NotesOnSameTime.Values;
+        List<Note> closestNotes = notesOnSameTime.First();
+        double currentTime = CurrentBeat;
 
-        List<Note> noteChunk = MapCreator._Map.NoteTimeChunks[beat];
-        foreach (var notes in noteChunk)
-            notes.gameObject.SetActive(show);
+        for (int i = 1; i < notesOnSameTime.Count; i++)
+        {
+            double comparedTime = notesOnSameTime[i].First()._time;
 
-        if (show)
-            ShowedNotes = noteChunk;
+            if (Math.Abs(comparedTime - currentTime) < Math.Abs(currentTime - closestNotes.First()._time))
+                closestNotes = notesOnSameTime[i];
+        }
 
-        currentTimeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(noteChunk);
+        return closestNotes;
     }
 
-    public void UpdateNoteTimerAfterPlaying(double currentBeat)
+    private List<Note> GetNextNotes()
     {
-        NoteTimer = MapCreator._Map.BeatLenghtInSeconds * currentBeat;
+        SortedList<double, List<Note>> noteTimeChunkcs = MapCreator._Map.NotesOnSameTime;
+        int nextIndex = noteTimeChunkcs.Values.IndexOf(ShowedNotes) + 1;
+
+        if (nextIndex <= noteTimeChunkcs.Count)
+            return noteTimeChunkcs.Values[nextIndex];
+
+        return null;
     }
 
-    public double GetCurrentNoteTimeInBeats()
+    private List<Note> GetPreviousNotes()
     {
-        return NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f;
+        int previousIndex = MapCreator._Map.NotesOnSameTime.Values.IndexOf(ShowedNotes) - 1;
+        if (previousIndex > 0 && MapCreator._Map.NotesOnSameTime.Values.Count > 0)
+            return MapCreator._Map.NotesOnSameTime.Values[previousIndex];
+
+        return null;
     }
 
-    public double SnapBeatTimeToPrecision(double beat, double precision)
+    public double GetSnappedPrecisionBeatTime(double beat, double precision)
     {
         double precisionValue = 1d / precision;
         int multiplier = (int)(beat / precisionValue);

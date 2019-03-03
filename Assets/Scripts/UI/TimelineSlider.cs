@@ -7,7 +7,7 @@ using TMPro;
 [RequireComponent(typeof(Slider))]
 public class TimelineSlider : MonoBehaviour
 {
-    private class TimeClock
+    private class ClockTime
     {
         public string TimeFormat { get; private set; }
         private int minutes;
@@ -32,7 +32,7 @@ public class TimelineSlider : MonoBehaviour
 
     private Slider slider;
 
-    private TimeClock timeClock = new TimeClock();
+    private ClockTime clockTime = new ClockTime();
 
     [SerializeField]
     private TextMeshProUGUI txtTime;
@@ -60,22 +60,28 @@ public class TimelineSlider : MonoBehaviour
         }
 
         if (hasSetMaxValue && MapEditorManager.Instance.Playing)
-            UpdateSliderTime((float)MapEditorManager.Instance.GetCurrentNoteTimeInBeats());
+            slider.value = (float)MapEditorManager.Instance.CurrentBeat;
     }
 
     public void OnValueChanged()
     {
-        MapEditorManager.Instance.ChangeTime(slider.value);
-        PlayTween.Instance.Step(slider.value);
+        if (!MapEditorManager.Instance.Playing)
+        {
+            SnapSliderToPrecision(slider.value);
+            MapEditorManager.Instance.ChangeTime(slider.value);
+        }
+
+        UpdateClockTime();
     }
 
-    public void UpdateSliderTime(float beat)
+    public void SnapSliderToPrecision(float beat)
     {
-        beat = (float)MapEditorManager.Instance.SnapBeatTimeToPrecision(beat, MapEditorManager.Instance.Precision);
+        slider.value = (float)MapEditorManager.Instance.GetSnappedPrecisionBeatTime(beat, MapEditorManager.Instance.Precision);
+    }
 
-        timeClock.SetTime(MapCreator._Map.BeatLenghtInSeconds * beat);
-        txtTime.text = timeClock.TimeFormat;
-
-        slider.value = beat;
+    private void UpdateClockTime()
+    {
+        clockTime.SetTime(MapCreator._Map.BeatLenghtInSeconds * slider.value);
+        txtTime.text = clockTime.TimeFormat;
     }
 }

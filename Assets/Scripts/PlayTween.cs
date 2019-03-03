@@ -24,7 +24,7 @@ public class PlayTween : MonoBehaviour
 
         if (MapEditorManager.Instance.Playing)
             iTween.MoveTo(gameObject, iTween.Hash("position", destination, "time",
-                MusicPlayer.Instance.MusicLengthInSeconds() - MapCreator._Map.BeatLenghtInSeconds * MapEditorManager.Instance.BeatCounter, 
+                MusicPlayer.Instance.MusicLengthInSeconds() - MapCreator._Map.BeatLenghtInSeconds * MapEditorManager.Instance.CurrentBeat, 
                 "easetype", iTween.EaseType.linear));
     }
 
@@ -42,7 +42,7 @@ public class PlayTween : MonoBehaviour
     private Vector3 GetBeatPosition()
     {
         return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 
-            (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.GetCurrentNoteTimeInBeats()) - distance);
+            (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.CurrentBeat) - distance);
     }
 
     private Vector3 GetBeatPosition(double beat)

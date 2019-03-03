@@ -29,14 +29,14 @@ public class Map
     #region Properties
 
     [JsonIgnore]
-    public SortedList<double, List<Note>> NoteTimeChunks { get; private set; }
+    public SortedList<double, List<Note>> NotesOnSameTime { get; private set; }
 
     [JsonIgnore]
-    public float BeatLenghtInSeconds
+    public double BeatLenghtInSeconds
     {
         get
         {
-            return 60f / _beatsPerMinute;
+            return 60d / _beatsPerMinute;
         }
     }
 
@@ -46,7 +46,7 @@ public class Map
 
     public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<Note> _notes)
     {
-        NoteTimeChunks = new SortedList<double, List<Note>>();
+        NotesOnSameTime = new SortedList<double, List<Note>>();
         this._version = _version;
         this._beatsPerMinute = _beatsPerMinute;
         this._noteJumpSpeed = _noteJumpSpeed;
@@ -59,6 +59,7 @@ public class Map
 
     public void RemoveNote(Note note)
     {
+        /*
         int timeStampIndex = MapCreator._Map.NoteTimeChunks.Values.IndexOf(MapEditorManager.Instance.ShowedNotes);
 
         _notesObjects.Remove(note);
@@ -66,12 +67,11 @@ public class Map
         if (NoteTimeChunks[note._time].Count == 0)
         {
             NoteTimeChunks.Remove(note._time);
-            MapEditorManager.Instance.ShowHideNotes(false, note._time);
             MapEditorManager.Instance.timeStamps.RemoveAt(timeStampIndex);
         }
 
         GameObject.Destroy(note.arrowCube);
-        GameObject.Destroy(note.gameObject);
+        GameObject.Destroy(note.gameObject);*/
     }
 
     public void ClearNotes()
@@ -84,8 +84,8 @@ public class Map
 
     public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
     {
-        if (!NoteTimeChunks.ContainsKey(time))
-            NoteTimeChunks.Add(time, new List<Note>());
+        if (!NotesOnSameTime.ContainsKey(time))
+            NotesOnSameTime.Add(time, new List<Note>());
 
         var note = GameObject.Instantiate(notePrefab);
         note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
@@ -93,7 +93,7 @@ public class Map
         note.gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;
         note.Set(GetBeatTime(_beatsPerMinute, 0, time), coordinate.x, coordinate.y, type, cutDirection);
 
-        NoteTimeChunks[time].Add(note);
+        NotesOnSameTime[time].Add(note);
         _notesObjects.Add(note);
 
         note.gameObject.SetActive(active);
@@ -141,7 +141,7 @@ public class Map
 
     public Note GetNote(double time, int cutDirection)
     {
-        foreach (var note in NoteTimeChunks[time])
+        foreach (var note in NotesOnSameTime[time])
         {
             if (note._cutDirection == cutDirection)
                 return note;
