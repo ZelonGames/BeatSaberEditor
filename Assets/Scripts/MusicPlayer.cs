@@ -45,7 +45,7 @@ public class MusicPlayer : MonoBehaviour
 
     public void ToggleSong()
     {
-        audioSource.time = (float)MapEditorManager.Instance.NoteTimer;
+        audioSource.time = (float)MapEditorManager.Instance.NoteTimer + (float)Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
 
         if (MapEditorManager.Instance.Playing)
             audioSource.Play();

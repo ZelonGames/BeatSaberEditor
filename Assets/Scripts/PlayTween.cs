@@ -15,7 +15,7 @@ public class PlayTween : MonoBehaviour
 
     private void Start()
     {
-        gameObject.transform.position = GetBeatPosition();
+        gameObject.transform.position = GetBeatPosition(MapEditorManager.Instance.CurrentBeat);
     }
 
     public void Move()
@@ -31,23 +31,17 @@ public class PlayTween : MonoBehaviour
     public void StopMoving()
     {
         iTween.Stop();
-        gameObject.transform.position = GetBeatPosition();
+        gameObject.transform.position = GetBeatPosition(MapEditorManager.Instance.CurrentBeat);
     }
 
     public void Step(float beat)
     {
         gameObject.transform.position = GetBeatPosition(beat);
     }
-
-    private Vector3 GetBeatPosition()
-    {
-        return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 
-            (float)_3DGridGenerator.Instance.GetBeatPosition(MapEditorManager.Instance.CurrentBeat) - distance);
-    }
-
+    
     private Vector3 GetBeatPosition(double beat)
     {
         return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 
-            (float)_3DGridGenerator.Instance.GetBeatPosition(beat) - distance);
+            (float)_3DGridGenerator.Instance.GetBeatPosition(beat, true) - distance);
     }
 }

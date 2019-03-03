@@ -83,6 +83,7 @@ public class Map
 
     public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
     {
+        time += GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
         if (!NotesOnSameTime.ContainsKey(time))
             NotesOnSameTime.Add(time, new List<Note>());
 

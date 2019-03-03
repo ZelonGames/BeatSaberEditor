@@ -34,7 +34,7 @@ public class MapEditorManager : MonoBehaviour
 
     public double NoteTimer { get; private set; }
 
-    public double CurrentBeat => NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f + Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
+    public double CurrentBeat => NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f;
 
     public int Precision { get; private set; }
     public bool Playing { get; private set; }
@@ -182,9 +182,9 @@ public class MapEditorManager : MonoBehaviour
 
         for (int i = 1; i < notesOnSameTime.Count; i++)
         {
-            double comparedTime = notesOnSameTime[i].First()._time;
+            double comparedTime = notesOnSameTime[i].First()._time - Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
 
-            if (Math.Abs(comparedTime - currentTime) < Math.Abs(currentTime - closestNotes.First()._time))
+            if (Math.Abs(comparedTime - currentTime) < Math.Abs(currentTime - (closestNotes.First()._time - Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset))))
                 closestNotes = notesOnSameTime[i];
         }
 
@@ -224,8 +224,9 @@ public class MapEditorManager : MonoBehaviour
         if (notes == null)
             return false;
 
-        double noteTime = precision.HasValue ? notesToShow.First()._time.GetNearestRoundedDown(precision.Value) : notesToShow.First()._time;
-        return CurrentBeat >= noteTime;
+        double noteTime = notesToShow.First()._time - Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
+        double roundedNoteTime = precision.HasValue ? noteTime.GetNearestRoundedDown(precision.Value) : noteTime;
+        return CurrentBeat >= roundedNoteTime;
     }
 
     #endregion

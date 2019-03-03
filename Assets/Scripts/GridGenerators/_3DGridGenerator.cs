@@ -5,6 +5,8 @@ using TMPro;
 
 public class _3DGridGenerator : MonoBehaviour
 {
+    #region Fields
+
     [SerializeField]
     private Canvas _3DCanvas;
     [SerializeField]
@@ -24,9 +26,17 @@ public class _3DGridGenerator : MonoBehaviour
 
     private bool hasGeneratedGrid = false;
 
+    #endregion
+
+    #region Properties
+
     public GameObject LastLine { get; private set; }
 
     public static _3DGridGenerator Instance { get; private set; }
+
+    #endregion
+
+    #region Events
 
     private void Awake()
     {
@@ -53,10 +63,9 @@ public class _3DGridGenerator : MonoBehaviour
         }
     }
 
-    public double GetBeatPosition(double beat)
-    {
-        return startYPos + distance * beat * 4 + Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
-    }
+    #endregion
+
+    #region Methods
 
     public Vector2 GetCoordinatePosition(Vector2Int coordinate, GameObject cube)
     {
@@ -67,10 +76,16 @@ public class _3DGridGenerator : MonoBehaviour
             (coordinate.y) * (2 - cubeHeight) - 50 * (coordinate.y) - cubeHeight * 0.5f);
     }
 
+    public double GetBeatPosition(double beat, bool noMS = false)
+    {
+        beat -= !noMS ? Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset) : 0;
+        return startYPos + distance * beat * 4;
+    }
+
     private void InstantiateTimeline()
     {
         GameObject timeline = Instantiate(timelinePrefab);
-        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(0), 0);
+        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(0, true), 0);
         timeline.transform.SetParent(_3DCanvas.transform, false);
     }
 
@@ -133,4 +148,6 @@ public class _3DGridGenerator : MonoBehaviour
         txt.transform.SetParent(_3DCanvas.transform, false);
         txt.text = text;
     }
+
+    #endregion
 }
