@@ -8,9 +8,9 @@ public class JsonEvent
 {
     public double _time;
     public int _type;
-    public double _value;
+    public int _value;
 
-    public JsonEvent(double _time, int _type, double _value)
+    public JsonEvent(double _time, int _type, int _value)
     {
         this._time = _time;
         this._type = _type;
