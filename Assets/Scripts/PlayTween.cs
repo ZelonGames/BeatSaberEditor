@@ -42,6 +42,6 @@ public class PlayTween : MonoBehaviour
     private Vector3 GetBeatPosition(double beat)
     {
         return new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 
-            (float)_3DGridGenerator.Instance.GetBeatPosition(beat, true) - distance);
+            (float)_3DGridGenerator.Instance.GetBeatPosition(beat) - distance);
     }
 }

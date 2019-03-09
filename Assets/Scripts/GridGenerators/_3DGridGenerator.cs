@@ -76,16 +76,15 @@ public class _3DGridGenerator : MonoBehaviour
             (coordinate.y) * (2 - cubeHeight) - 50 * (coordinate.y) - cubeHeight * 0.5f);
     }
 
-    public double GetBeatPosition(double beat, bool noMS = false)
+    public double GetBeatPosition(double beat)
     {
-        beat -= !noMS ? Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset) : 0;
         return startYPos + distance * beat * 4;
     }
 
     private void InstantiateTimeline()
     {
         GameObject timeline = Instantiate(timelinePrefab);
-        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(0, true), 0);
+        timeline.transform.position = new Vector3(0, (float)GetBeatPosition(0), 0);
         timeline.transform.SetParent(_3DCanvas.transform, false);
     }
 

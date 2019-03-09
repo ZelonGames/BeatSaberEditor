@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -9,7 +10,7 @@ public class MapInfo
 
     public string songName;
     public string songSubName;
-    public string songAuthorName;
+    public string authorName;
     public int beatsPerMinute;
     public int previewStartTime;
     public int previewDuration;
@@ -24,11 +25,11 @@ public class MapInfo
 
     #endregion
 
-    public MapInfo(string songName, string songSubName, string songAuthorName, int beatsPerMinute, int previewStartTime, int previewDuration, string coverImagePath, string environmentName, bool oneSaber, List<DifficultyLevel> difficultyLevels)
+    public MapInfo(string songName, string songSubName, string authorName, int beatsPerMinute, int previewStartTime, int previewDuration, string coverImagePath, string environmentName, bool oneSaber, List<DifficultyLevel> difficultyLevels)
     {
         this.songName = songName;
         this.songSubName = songSubName;
-        this.songAuthorName = songAuthorName;
+        this.authorName = authorName;
         this.beatsPerMinute = beatsPerMinute;
         this.previewStartTime = previewStartTime;
         this.previewDuration = previewDuration;
@@ -40,11 +41,6 @@ public class MapInfo
 
     public DifficultyLevel GetDifficulty(string difficultyName)
     {
-        foreach(var difficulty in difficultyLevels)
-        {
-            if (difficulty.difficulty == difficultyName)
-                return difficulty;
-        }
-        return null;
+        return difficultyLevels.Where(x => x.difficulty == difficultyName).FirstOrDefault();
     }
 }

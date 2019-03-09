@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,20 +10,15 @@ public class Map
 {
     #region Fields
 
-    #region Items
-
-    [JsonIgnore]
-    public List<Note> _notesObjects;
-    public List<JsonNote> _notes;
-
-    #endregion
-
     public string _version;
     public int _beatsPerMinute;
     public int _beatsPerBar;
     public int _noteJumpSpeed;
     public int _shuffle;
     public double _shufflePeriod = 0.5;
+
+    public List<JsonNote> _notes;
+    public List<JsonEvent> _events;
 
     #endregion
 
@@ -44,13 +40,14 @@ public class Map
 
     #region Constructors
 
-    public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<Note> _notes)
+    public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<JsonNote> _notes, List<JsonEvent> _events)
     {
         NotesOnSameTime = new SortedList<double, List<Note>>();
         this._version = _version;
         this._beatsPerMinute = _beatsPerMinute;
         this._noteJumpSpeed = _noteJumpSpeed;
-        this._notesObjects = _notes;
+        this._notes = _notes;
+        this._events = _events;
     }
 
     #endregion
@@ -61,7 +58,6 @@ public class Map
     {
         int timeStampIndex = MapCreator._Map.NotesOnSameTime.Values.IndexOf(MapEditorManager.Instance.ShowedNotes);
 
-        _notesObjects.Remove(note);
         NotesOnSameTime[note._time].Remove(note);
         if (NotesOnSameTime[note._time].Count == 0)
         {
@@ -73,29 +69,21 @@ public class Map
         GameObject.Destroy(note.gameObject);
     }
 
-    public void ClearNotes()
-    {
-        if (_notes != null)
-            _notes.Clear();
-        if (_notesObjects != null)
-            _notesObjects.Clear();
-    }
-
     public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
     {
-        time += GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
+        time -= GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.oldOffset);
+
         if (!NotesOnSameTime.ContainsKey(time))
             NotesOnSameTime.Add(time, new List<Note>());
 
         var note = GameObject.Instantiate(notePrefab);
         note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
-        note.gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle(cutDirection).Value);
+        if (CutDirectionButton.GetAngle(cutDirection).HasValue)
+            note.gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle(cutDirection).Value);
         note.gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;
         note.Set(GetBeatTime(_beatsPerMinute, 0, time), coordinate.x, coordinate.y, type, cutDirection);
 
         NotesOnSameTime[time].Add(note);
-        _notesObjects.Add(note);
-
         note.gameObject.SetActive(active);
 
         GameObject arrowCube = null;
@@ -116,7 +104,8 @@ public class Map
         Vector2 arrowCubePos = _3DGridGenerator.Instance.GetCoordinatePosition(coordinate, arrowCube);
 
         arrowCube.transform.position = new Vector3(arrowCubePos.x, (float)_3DGridGenerator.Instance.GetBeatPosition(time), arrowCubePos.y);
-        arrowCube.transform.Rotate(Vector3.back, CutDirectionButton.GetAngle((Note.CutDirection)note._cutDirection).Value);
+        if (CutDirectionButton.GetAngle((Note.CutDirection)note._cutDirection).HasValue)
+            arrowCube.transform.Rotate(Vector3.back, CutDirectionButton.GetAngle((Note.CutDirection)note._cutDirection).Value);
         arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
 
         note.arrowCube = arrowCube;
@@ -152,5 +141,3 @@ public class Map
 
     #endregion
 }
-//kristina
-//0175547040

@@ -78,12 +78,12 @@ public class Note : MonoBehaviour
 public class JsonNote
 {
     public double _time;
-    public int _lineIndex;
-    public int _lineLayer;
+    public double _lineIndex;
+    public double _lineLayer;
     public int _type;
     public int _cutDirection;
 
-    public JsonNote(double _time, int _lineIndex, int _lineLayer, Note.ItemType _type, Note.CutDirection _cutDirection)
+    public JsonNote(double _time, double _lineIndex, double _lineLayer, Note.ItemType _type, Note.CutDirection _cutDirection)
     {
         this._time = _time;
         this._lineIndex = _lineIndex;

@@ -8,20 +8,7 @@ public class MusicPlayer : MonoBehaviour
     [SerializeField]
     private AudioSource audioSource;
 
-    public float MusicLengthInSeconds()
-    {
-        if (audioSource.clip == null)
-            return 0;
-        return audioSource.clip.length;
-    }
-
-    public bool IsLoaded
-    {
-        get
-        {
-            return audioSource.clip != null && audioSource.clip.loadState == AudioDataLoadState.Loaded;
-        }
-    }
+    public bool IsLoaded => audioSource.clip != null && audioSource.clip.loadState == AudioDataLoadState.Loaded;
 
     public static MusicPlayer Instance { get; private set; }
 
@@ -45,11 +32,19 @@ public class MusicPlayer : MonoBehaviour
 
     public void ToggleSong()
     {
-        audioSource.time = (float)MapEditorManager.Instance.NoteTimer + (float)Map.GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.offset);
+        float offsetTime = MapCreator._MapInfo.currentDifficulty.offset > 0 ? MapCreator._MapInfo.currentDifficulty.offset * 0.001f : 0;
+        audioSource.time = (float)MapEditorManager.Instance.NoteTimer + offsetTime;
 
         if (MapEditorManager.Instance.Playing)
             audioSource.Play();
         else
             audioSource.Stop();
+    }
+
+    public float MusicLengthInSeconds()
+    {
+        if (audioSource.clip == null)
+            return 0;
+        return audioSource.clip.length;
     }
 }

@@ -2159,7 +2159,7 @@ Prefab:
     - target: {fileID: 114347201574417574, guid: caeac4aa474f1594bb4a83295f1d299f,
         type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnUpdateMapData
+      value: OnCreateMap
       objectReference: {fileID: 0}
     - target: {fileID: 114347201574417574, guid: caeac4aa474f1594bb4a83295f1d299f,
         type: 2}
