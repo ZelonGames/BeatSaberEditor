@@ -17,19 +17,13 @@ public static class MapLoader
         MapCreator._MapInfo.currentDifficulty = MapCreator._MapInfo.difficultyLevels.Last();
     }
 
-    public static void SetJsonMap(string songName, string difficulty)
+    public static Map SetJsonMap(string songName, string difficulty)
     {
         string file = Filebrowser.CustomSongsPath + "/" + songName + "/" + difficulty + ".json";
         if (!File.Exists(file))
-            return;
+            return null;
 
         string json = File.ReadAllText(file);
-        MapCreator._Map = JsonConvert.DeserializeObject<Map>(json);
-    }
-
-    public static void LoadMap(Note notePrefab, GameObject bombPrefab, GameObject blueCubePrefab, GameObject redCubePrefab)
-    {
-        foreach (var note in MapCreator._Map._notes)
-            MapCreator._Map.AddNote(notePrefab, bombPrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int((int)note._lineIndex, (int)note._lineLayer), note._time, (Note.ItemType)note._type, false);
+        return MapCreator._Map = JsonConvert.DeserializeObject<Map>(json);
     }
 }

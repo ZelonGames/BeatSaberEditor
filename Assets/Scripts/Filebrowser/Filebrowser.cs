@@ -130,6 +130,13 @@ public class Filebrowser : MonoBehaviour
         ShowDirectoriesAndFiles(currentPath);
     }
 
+    public static void ResetAllPaths()
+    {
+        folder.ResetPath();
+        image.ResetPath();
+        audio.ResetPath();
+    }
+
     public void ShowDirectoriesAndFiles(string directory)
     {
         try

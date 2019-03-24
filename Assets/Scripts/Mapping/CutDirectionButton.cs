@@ -84,10 +84,7 @@ public class CutDirectionButton : MonoBehaviour
         notePlacer = GameObject.FindGameObjectWithTag("NotePlacer");
         Note note = MapCreator._Map.AddNote(notePrefab, null, arrowCubeBluePrefab, arrowCubeRedPrefab, _CutDirection, tileParent.Coordinate, MapEditorManager.Instance.CurrentBeat, MapEditorManager.Instance.ItemType, true);
 
-        if (MapEditorManager.Instance.timeStamps.IndexOf(MapCreator._Map.BeatLenghtInSeconds * note._time) < 0)
-            MapEditorManager.Instance.timeStamps.Add(MapCreator._Map.BeatLenghtInSeconds * note._time);
-
-        MapEditorManager.Instance.timeStamps = MapEditorManager.Instance.timeStamps.OrderBy(x => x).ToList();
+        MapCreator._Map.timeStamps = MapCreator._Map.timeStamps.OrderBy(x => x).ToList();
         notePlacer.SetActive(false);
 
         MapEditorManager.Instance.HideNotes(MapEditorManager.Instance.ShowedNotes);

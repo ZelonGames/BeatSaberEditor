@@ -17,32 +17,41 @@ public class Map
     public int _shuffle;
     public double _shufflePeriod = 0.5;
 
-    public List<JsonNote> _notes;
     public List<JsonEvent> _events;
+    public List<JsonNote> _notes;
 
     #endregion
 
     #region Properties
 
+    public List<double> timeStamps = new List<double>();
+
     [JsonIgnore]
     public SortedList<double, List<Note>> NotesOnSameTime { get; private set; }
 
     [JsonIgnore]
-    public double BeatLenghtInSeconds
-    {
-        get
-        {
-            return 60d / _beatsPerMinute;
-        }
-    }
+    public double BeatLenghtInSeconds => 60d / _beatsPerMinute;
+
+    [JsonIgnore]
+    public bool IsLoaded { get; private set; }
 
     #endregion
 
     #region Constructors
 
-    public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<JsonNote> _notes, List<JsonEvent> _events)
+    public Map()
     {
         NotesOnSameTime = new SortedList<double, List<Note>>();
+        this._events = new List<JsonEvent>();
+        this._notes = new List<JsonNote>();
+
+        this._version = "1.0";
+        this._beatsPerMinute = 0;
+        this._noteJumpSpeed = 0;
+    }
+
+    public Map(string _version, int _beatsPerMinute, int _beatsPerBar, int _noteJumpSpeed, List<JsonNote> _notes, List<JsonEvent> _events) : this()
+    {
         this._version = _version;
         this._beatsPerMinute = _beatsPerMinute;
         this._noteJumpSpeed = _noteJumpSpeed;
@@ -54,6 +63,11 @@ public class Map
 
     #region Methods
 
+    public static Map GetNewEmptyMapFrom(Map map)
+    {
+        return new Map(map._version, map._beatsPerMinute, map._beatsPerBar, map._noteJumpSpeed, new List<JsonNote>(), new List<JsonEvent>());
+    }
+
     public void RemoveNote(Note note)
     {
         int timeStampIndex = MapCreator._Map.NotesOnSameTime.Values.IndexOf(MapEditorManager.Instance.ShowedNotes);
@@ -62,11 +76,30 @@ public class Map
         if (NotesOnSameTime[note._time].Count == 0)
         {
             NotesOnSameTime.Remove(note._time);
-            MapEditorManager.Instance.timeStamps.RemoveAt(timeStampIndex);
+            timeStamps.RemoveAt(timeStampIndex);
         }
 
         GameObject.Destroy(note.arrowCube);
         GameObject.Destroy(note.gameObject);
+    }
+
+    public void Load(Note notePrefab, GameObject bombPrefab, GameObject blueCubePrefab, GameObject redCubePrefab)
+    {
+        foreach (var note in MapCreator._Map._notes)
+            AddNote(notePrefab, bombPrefab, blueCubePrefab, redCubePrefab, (Note.CutDirection)note._cutDirection, new Vector2Int((int)note._lineIndex, (int)note._lineLayer), note._time, (Note.ItemType)note._type, false);
+
+        LoadTimeStamps();
+
+        IsLoaded = true;
+    }
+
+    public void UnLoad()
+    {
+        MapCreator._Map = null;
+        MapCreator._MapInfo = null;
+        Filebrowser.ResetAllPaths();
+
+        IsLoaded = false;
     }
 
     public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
@@ -76,46 +109,18 @@ public class Map
         if (!NotesOnSameTime.ContainsKey(time))
             NotesOnSameTime.Add(time, new List<Note>());
 
-        var note = GameObject.Instantiate(notePrefab);
-        note.gameObject.transform.SetParent(GameObject.FindGameObjectWithTag("2DGrid").transform);
-        if (CutDirectionButton.GetAngle(cutDirection).HasValue)
-            note.gameObject.transform.Rotate(Vector3.forward, CutDirectionButton.GetAngle(cutDirection).Value);
-        note.gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;
-        note.Set(GetBeatTime(_beatsPerMinute, 0, time), coordinate.x, coordinate.y, type, cutDirection);
-
+        Note note = Note.Instantiate(notePrefab, bombSpherePrefab, blueCubePrefab, redCubePrefab, cutDirection, coordinate, time, type, active);
         NotesOnSameTime[time].Add(note);
-        note.gameObject.SetActive(active);
 
-        GameObject arrowCube = null;
-        switch (type)
-        {
-            case Note.ItemType.Red:
-                arrowCube = GameObject.Instantiate(redCubePrefab);
-                break;
-            case Note.ItemType.Blue:
-                arrowCube = GameObject.Instantiate(blueCubePrefab);
-                break;
-            case Note.ItemType.Bomb:
-                arrowCube = GameObject.Instantiate(bombSpherePrefab);
-                break;
-            default:
-                break;
-        }
-        Vector2 arrowCubePos = _3DGridGenerator.Instance.GetCoordinatePosition(coordinate, arrowCube);
-
-        arrowCube.transform.position = new Vector3(arrowCubePos.x, (float)_3DGridGenerator.Instance.GetBeatPosition(time), arrowCubePos.y);
-        if (CutDirectionButton.GetAngle((Note.CutDirection)note._cutDirection).HasValue)
-            arrowCube.transform.Rotate(Vector3.back, CutDirectionButton.GetAngle((Note.CutDirection)note._cutDirection).Value);
-        arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
-
-        note.arrowCube = arrowCube;
+        if (MapCreator._Map.timeStamps.IndexOf(MapCreator._Map.BeatLenghtInSeconds * note._time) < 0)
+            MapCreator._Map.timeStamps.Add(MapCreator._Map.BeatLenghtInSeconds * note._time);
 
         return note;
     }
 
-    public double GetAmountOfBeatsInSong()
+    public Note GetNote(double time, int cutDirection)
     {
-        return MusicPlayer.Instance.MusicLengthInSeconds() / BeatLenghtInSeconds;
+        return NotesOnSameTime[time].Where(x => x._cutDirection == cutDirection).FirstOrDefault();
     }
 
     public static double GetBeatTime(double bpm, double ms, double _time)
@@ -128,15 +133,25 @@ public class Map
         return (bpm / 60000) * ms;
     }
 
-    public Note GetNote(double time, int cutDirection)
+    public double GetAmountOfBeatsInSong()
     {
-        foreach (var note in NotesOnSameTime[time])
-        {
-            if (note._cutDirection == cutDirection)
-                return note;
-        }
+        return MusicPlayer.Instance.MusicLengthInSeconds() / BeatLenghtInSeconds;
+    }
 
-        return null;
+    private void LoadTimeStamps()
+    {
+        timeStamps.Clear();
+        if (MapCreator._Map._notes == null)
+            return;
+
+        foreach (var notes in MapCreator._Map.NotesOnSameTime.Values)
+        {
+            if (notes.Count == 0)
+                continue;
+
+            double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
+            timeStamps.Add(noteTime);
+        }
     }
 
     #endregion

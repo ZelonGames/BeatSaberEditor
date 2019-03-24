@@ -25,6 +25,11 @@ public class MapInfo
 
     #endregion
 
+    public MapInfo()
+    {
+        difficultyLevels = new List<DifficultyLevel>();
+    }
+
     public MapInfo(string songName, string songSubName, string authorName, int beatsPerMinute, int previewStartTime, int previewDuration, string coverImagePath, string environmentName, bool oneSaber, List<DifficultyLevel> difficultyLevels)
     {
         this.songName = songName;

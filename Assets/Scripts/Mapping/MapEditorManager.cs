@@ -10,8 +10,6 @@ public class MapEditorManager : MonoBehaviour
 {
     #region Fields
 
-    public List<double> timeStamps = new List<double>();
-
     [SerializeField]
     private GameObject timeline;
     [SerializeField]
@@ -50,7 +48,6 @@ public class MapEditorManager : MonoBehaviour
         Instance = this;
         ItemType = Note.ItemType.Blue;
         Precision = 1;
-        LoadTimeStamps();
     }
 
     private void Update()
@@ -89,9 +86,7 @@ public class MapEditorManager : MonoBehaviour
             ChangeTime(GetSnappedPrecisionBeatTime(CurrentBeat, Precision));
         }
         else
-        {
             notesToShow = GetClosestNotes();
-        }
     }
 
     public void OnBlueArrowSelected()
@@ -158,23 +153,6 @@ public class MapEditorManager : MonoBehaviour
         Precision = value;
     }
 
-    private void LoadTimeStamps()
-    {
-        timeStamps.Clear();
-        if (MapCreator._Map._notes == null)
-            return;
-
-        foreach (var notes in MapCreator._Map.NotesOnSameTime.Values)
-        {
-            if (notes.Count == 0)
-            {
-                continue;
-            }
-            double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
-            timeStamps.Add(noteTime);
-        }
-    }
-
     private List<Note> GetClosestNotes()
     {
         if (MapCreator._Map.NotesOnSameTime.Count == 0)
@@ -200,7 +178,7 @@ public class MapEditorManager : MonoBehaviour
         SortedList<double, List<Note>> noteTimeChunkcs = MapCreator._Map.NotesOnSameTime;
         int nextIndex = noteTimeChunkcs.Values.IndexOf(ShowedNotes) + 1;
 
-        if (nextIndex <= noteTimeChunkcs.Count)
+        if (nextIndex < noteTimeChunkcs.Count)
             return noteTimeChunkcs.Values[nextIndex];
 
         return null;
