@@ -73,7 +73,7 @@ public class MapEditorManager : MonoBehaviour
             return;
 
         double jumpLength = 1d / Precision;
-        ChangeTime(CurrentBeat + (forward ? jumpLength : -jumpLength));
+        ChangeTime(CurrentBeat + (forward ? jumpLength : -jumpLength), true);
     }
 
     public void OnPlay()
@@ -128,7 +128,7 @@ public class MapEditorManager : MonoBehaviour
             note.gameObject.SetActive(false);
     }
 
-    public void ChangeTime(double beat)
+    public void ChangeTime(double beat, bool manuallyChangingTime = false)
     {
         double prevNoteTimer = NoteTimer;
         double beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
@@ -139,13 +139,11 @@ public class MapEditorManager : MonoBehaviour
 
         notesToShow = GetClosestNotes();
 
-        if (ShouldShowNotes(notesToShow, 1/64d))
-        {
-            if (ShowedNotes != null)
-                HideNotes(ShowedNotes);
+        if (ShowedNotes != null)
+            HideNotes(ShowedNotes);
 
+        if (ShouldShowNotes(notesToShow, 1/64d, manuallyChangingTime))
             ShowNotes(notesToShow);
-        }
     }
 
     public void ChangePrecision(int value)
@@ -201,14 +199,14 @@ public class MapEditorManager : MonoBehaviour
         return multiplier / precision;
     }
 
-    private bool ShouldShowNotes(List<Note> notes, double? precision = null)
+    private bool ShouldShowNotes(List<Note> notes, double? precision = null, bool manuallyChangingTime = false)
     {
         if (notes == null)
             return false;
 
         double noteTime = notesToShow.First()._time;
         double roundedNoteTime = precision.HasValue ? noteTime.GetNearestRoundedDown(precision.Value) : noteTime;
-        return CurrentBeat >= roundedNoteTime;
+        return CurrentBeat >= roundedNoteTime && (manuallyChangingTime ? CurrentBeat - roundedNoteTime <= 1d / 64 / Precision : true);
     }
 
     #endregion
