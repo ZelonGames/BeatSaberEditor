@@ -159,8 +159,8 @@ public class MapCreator : MonoBehaviour
             _Map = Map.GetNewEmptyMapFrom(_Map);
         }
 
-        _MapInfo.currentDifficulty.offset = Convert.ToInt32(inputStartOffset.text);
-        _Map._noteJumpSpeed = Convert.ToInt32(inputNoteJumpSpeed.text);
+        _MapInfo.currentDifficulty.offset = StringToInt(inputStartOffset.text);
+        _Map._noteJumpSpeed = StringToInt(inputNoteJumpSpeed.text);
     }
 
     #endregion
