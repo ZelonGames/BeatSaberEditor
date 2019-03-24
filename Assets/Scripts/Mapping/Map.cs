@@ -93,11 +93,12 @@ public class Map
         IsLoaded = true;
     }
 
-    public void UnLoad()
+    public void UnLoad(bool resetFileBrowser)
     {
         MapCreator._Map = null;
         MapCreator._MapInfo = null;
-        Filebrowser.ResetAllPaths();
+        if (resetFileBrowser)
+            Filebrowser.ResetAllPaths();
 
         IsLoaded = false;
     }

@@ -68,7 +68,7 @@ public class MapCreator : MonoBehaviour
             if (Filebrowser.folder._FilePath != null)
             {
                 if (_Map != null && _Map.IsLoaded)
-                    _Map.UnLoad();
+                    _Map.UnLoad(false);
 
                 if (_MapInfo == null)
                     MapLoader.SetJsonMapInfo(Filebrowser.folder.FileName);
@@ -102,7 +102,7 @@ public class MapCreator : MonoBehaviour
 
     public void OnUnloadMap()
     {
-        _Map.UnLoad();
+        _Map.UnLoad(true);
     }
 
     public void OnUpdateMap()
