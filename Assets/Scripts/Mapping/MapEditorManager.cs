@@ -137,6 +137,9 @@ public class MapEditorManager : MonoBehaviour
         TimelineSlider.Instance.SnapSliderToPrecision((float)beat);
         PlayTween.Instance.Step((float)GetSnappedPrecisionBeatTime(beat, Precision));
 
+        if (_3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat))
+            _3DGridGenerator.Instance._3DGrid.Update();
+
         notesToShow = GetClosestNotes();
 
         if (ShowedNotes != null)

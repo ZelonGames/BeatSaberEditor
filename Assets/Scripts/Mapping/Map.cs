@@ -113,8 +113,8 @@ public class Map
         Note note = Note.Instantiate(notePrefab, bombSpherePrefab, blueCubePrefab, redCubePrefab, cutDirection, coordinate, time, type, active);
         NotesOnSameTime[time].Add(note);
 
-        if (MapCreator._Map.timeStamps.IndexOf(MapCreator._Map.BeatLenghtInSeconds * note._time) < 0)
-            MapCreator._Map.timeStamps.Add(MapCreator._Map.BeatLenghtInSeconds * note._time);
+        if (timeStamps.IndexOf(BeatLenghtInSeconds * note._time) < 0)
+            timeStamps.Add(BeatLenghtInSeconds * note._time);
 
         return note;
     }
