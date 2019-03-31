@@ -56,6 +56,9 @@ public class MapEditorManager : MonoBehaviour
         {
             NoteTimer += Time.deltaTime;
 
+            if (_3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat))
+                _3DGridGenerator.Instance._3DGrid.Update();
+
             if (ShouldShowNotes(notesToShow))
             {
                 if (ShowedNotes != null)
