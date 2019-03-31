@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 public static class MapLoader
 {
-    public static void SetJsonMapInfo(string songName)
+    public static void SetJsonMapInfo(string songName, string difficulty = null)
     {
         string file = Filebrowser.CustomSongsPath + "/" + songName + "/info.json";
         if (!File.Exists(file))
@@ -14,7 +14,10 @@ public static class MapLoader
 
         string json = File.ReadAllText(file);
         MapCreator._MapInfo = JsonConvert.DeserializeObject<MapInfo>(json);
-        MapCreator._MapInfo.currentDifficulty = MapCreator._MapInfo.difficultyLevels.Last();
+        if (difficulty == null)
+            MapCreator._MapInfo.currentDifficulty = MapCreator._MapInfo.difficultyLevels.First();
+        else
+            MapCreator._MapInfo.currentDifficulty = MapCreator._MapInfo.GetDifficulty(difficulty);
     }
 
     public static Map SetJsonMap(string songName, string difficulty)

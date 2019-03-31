@@ -132,7 +132,7 @@ public class MapCreator : MonoBehaviour
             return;
         }
 
-        MapLoader.SetJsonMapInfo(Filebrowser.folder.FileName);
+        MapLoader.SetJsonMapInfo(Filebrowser.folder.FileName, GetSelectedDifficultyName());
         if (MapLoader.SetJsonMap(_MapInfo.songName, GetSelectedDifficultyName()) == null)
             _MapInfo.currentDifficulty = null;
 
@@ -190,6 +190,7 @@ public class MapCreator : MonoBehaviour
             UpdateInputFieldsToDefault();
 
         txtImageFileName.text = Filebrowser.image.HasSelectedFile ? Filebrowser.image.FileName : _MapInfo.coverImagePath;
+        shouldTriggerOnDifficultyChanged = true;
     }
 
     private void UpdateInputFieldsToDefault()

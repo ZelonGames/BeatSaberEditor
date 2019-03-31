@@ -41,7 +41,7 @@ public class MapInfo
         this.coverImagePath = coverImagePath;
         this.environmentName = environmentName;
         this.oneSaber = oneSaber;
-        this.difficultyLevels = difficultyLevels;
+        this.difficultyLevels = difficultyLevels.OrderBy(x => x.difficultyRank).ToList();
     }
 
     public DifficultyLevel GetDifficulty(string difficultyName)
