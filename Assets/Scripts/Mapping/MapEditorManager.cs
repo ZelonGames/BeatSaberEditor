@@ -130,6 +130,10 @@ public class MapEditorManager : MonoBehaviour
 
     public void ChangeTime(double beat, bool manuallyChangingTime = false)
     {
+        if (beat < 0)
+            return;
+
+        bool forward = beat > CurrentBeat;
         double prevNoteTimer = NoteTimer;
         double beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
         NoteTimer = beatLengthInSeconds * beat;
@@ -137,8 +141,8 @@ public class MapEditorManager : MonoBehaviour
         TimelineSlider.Instance.SnapSliderToPrecision((float)beat);
         PlayTween.Instance.Step((float)GetSnappedPrecisionBeatTime(beat, Precision));
 
-        if (_3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat))
-            _3DGridGenerator.Instance._3DGrid.Update();
+        if (_3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat, forward))
+            _3DGridGenerator.Instance._3DGrid.Update(forward);
 
         notesToShow = GetClosestNotes();
 
@@ -209,7 +213,7 @@ public class MapEditorManager : MonoBehaviour
 
         double noteTime = notesToShow.First()._time;
         double roundedNoteTime = precision.HasValue ? noteTime.GetNearestRoundedDown(precision.Value) : noteTime;
-        return CurrentBeat >= roundedNoteTime && (manuallyChangingTime ? CurrentBeat - roundedNoteTime <= 1d / 64 / Precision : true);
+        return CurrentBeat >= roundedNoteTime && (manuallyChangingTime ? CurrentBeat - roundedNoteTime <= 1d / Precision : true);
     }
 
     #endregion

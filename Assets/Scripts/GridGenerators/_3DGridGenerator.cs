@@ -233,24 +233,40 @@ public class _3DGridGenerator : MonoBehaviour
             LastBeatGrid = BeatGrids[renderDistance - 1];
         }
 
-        public void Update()
+        public void Update(bool forward = true)
         {
-            MoveBeatGrid(FirstBeatGrid.Beat, LastBeatGrid.Beat);
+            if (forward)
+                MoveBeatGrid(FirstBeatGrid.Beat, LastBeatGrid.Beat);
+            else
+                MoveBeatGrid(LastBeatGrid.Beat, FirstBeatGrid.Beat);
         }
 
         private void MoveBeatGrid(int from, int to)
         {
-            if (!BeatGrids.ContainsKey(from))
+            if (!BeatGrids.ContainsKey(from) || to <= 0)
                 return;
 
             BeatGrid beatToMove = BeatGrids[from];
-            FirstBeatGrid = BeatGrids[beatToMove.Beat + 1];
+            if (from == FirstBeatGrid.Beat)
+            {
+                FirstBeatGrid = BeatGrids[beatToMove.Beat + 1];
 
-            beatToMove.Move(to + 1);
-            LastBeatGrid = beatToMove;
+                beatToMove.Move(to + 1);
+                LastBeatGrid = beatToMove;
 
-            BeatGrids.Remove(from);
-            BeatGrids.Add(to + 1, beatToMove);
+                BeatGrids.Remove(from);
+                BeatGrids.Add(to + 1, beatToMove);
+            }
+            else if (from == LastBeatGrid.Beat)
+            {
+                beatToMove.Move(to - 1);
+                BeatGrids.Remove(from);
+
+                BeatGrids.Add(to - 1, beatToMove);
+
+                FirstBeatGrid = BeatGrids[to - 1];
+                LastBeatGrid = BeatGrids[from - 1];
+            }
         }
 
         private BeatGrid GenerateBeatGrid(int beat)
@@ -260,9 +276,12 @@ public class _3DGridGenerator : MonoBehaviour
             return new BeatGrid(beat, horizontalLines, Instance.GenerateVerticalLines(beat), size);
         }
 
-        public bool shouldUpdate(double currentBeat)
+        public bool shouldUpdate(double currentBeat, bool forward = true)
         {
-            return Math.Abs(currentBeat - FirstBeatGrid.Beat) >= 2;
+            if (forward)
+                return Math.Abs(currentBeat - FirstBeatGrid.Beat) >= 2;
+            else
+                return Math.Abs(currentBeat - FirstBeatGrid.Beat) <= 2;
         }
     }
 }
