@@ -17,7 +17,8 @@ public class MapEditorManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
 
-    private List<Note> notesToShow = null;
+    private SortedList<double, List<Note>> notesToShow = null;
+    private List<Note> nextNotesToShow = null;
 
     public readonly int maxPrecision = 64;
 
@@ -59,13 +60,13 @@ public class MapEditorManager : MonoBehaviour
             if (_3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat))
                 _3DGridGenerator.Instance._3DGrid.Update();
 
-            if (ShouldShowNotes(notesToShow))
+            if (ShouldShowNotes(nextNotesToShow))
             {
                 if (ShowedNotes != null)
                     HideNotes(ShowedNotes);
 
-                ShowNotes(notesToShow);
-                notesToShow = GetNextNotes();
+                ShowNotes(nextNotesToShow);
+                nextNotesToShow = GetNextNotes();
             }
         }
     }
@@ -89,7 +90,7 @@ public class MapEditorManager : MonoBehaviour
             ChangeTime(GetSnappedPrecisionBeatTime(CurrentBeat, Precision));
         }
         else
-            notesToShow = GetClosestNotes();
+            nextNotesToShow = GetClosestNotes();
     }
 
     public void OnBlueArrowSelected()
@@ -110,6 +111,14 @@ public class MapEditorManager : MonoBehaviour
     #endregion
 
     #region Methods
+
+    public void UpdateNotesToShow()
+    {
+        notesToShow = MapCreator._Map.GetNotesBetween(_3DGridGenerator.Instance._3DGrid.FirstBeatGrid.Beat, _3DGridGenerator.Instance._3DGrid.LastBeatGrid.Beat);
+
+        foreach (var notes in notesToShow.Values)
+            notes.ForEach(x => x.arrowCube.SetActive(true));
+    }
 
     public void ShowNotes(List<Note> notes)
     {
@@ -148,13 +157,13 @@ public class MapEditorManager : MonoBehaviour
         if (jumpDistance > 1 || _3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat, forward))
             _3DGridGenerator.Instance._3DGrid.Update(jumpDistance, forward);
 
-        notesToShow = GetClosestNotes();
+        nextNotesToShow = GetClosestNotes();
 
         if (ShowedNotes != null)
             HideNotes(ShowedNotes);
 
-        if (ShouldShowNotes(notesToShow, 1/64d, manuallyChangingTime))
-            ShowNotes(notesToShow);
+        if (ShouldShowNotes(nextNotesToShow, 1/64d, manuallyChangingTime))
+            ShowNotes(nextNotesToShow);
     }
 
     public void ChangePrecision(int value)
@@ -215,9 +224,9 @@ public class MapEditorManager : MonoBehaviour
         if (notes == null)
             return false;
 
-        double noteTime = notesToShow.First()._time;
+        double noteTime = nextNotesToShow.First()._time;
         double roundedNoteTime = precision.HasValue ? noteTime.GetNearestRoundedDown(precision.Value) : noteTime;
-        return CurrentBeat >= roundedNoteTime && (manuallyChangingTime ? CurrentBeat - roundedNoteTime <= 1d / Precision : true);
+        return CurrentBeat >= roundedNoteTime && (manuallyChangingTime ? CurrentBeat - roundedNoteTime <= 1d / Precision / 2 : true);
     }
 
     #endregion

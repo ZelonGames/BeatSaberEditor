@@ -59,6 +59,8 @@ public class _3DGridGenerator : MonoBehaviour
             _3DGrid = new Grid(10);
             InstantiateTimeline();
             hasGeneratedGrid = true;
+
+            MapEditorManager.Instance.UpdateNotesToShow();
         }
     }
 
