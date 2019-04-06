@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+
 using UnityEngine.UI;
 
 public class Note : MonoBehaviour
@@ -78,6 +79,7 @@ public class Note : MonoBehaviour
         note.gameObject.transform.position = GridGenerator.Instance.Tiles[coordinate].gameObject.transform.position;
         note.Set(time, coordinate.x, coordinate.y, type, cutDirection);
 
+        
         GameObject arrowCube = null;
         switch (type)
         {
@@ -93,7 +95,7 @@ public class Note : MonoBehaviour
             default:
                 break;
         }
-
+        
         Vector2 arrowCubePos = _3DGridGenerator.Instance.GetCoordinatePosition(coordinate, arrowCube);
 
         arrowCube.transform.position = new Vector3(arrowCubePos.x, (float)_3DGridGenerator.Instance.GetBeatPosition(time), arrowCubePos.y);
@@ -101,6 +103,7 @@ public class Note : MonoBehaviour
             arrowCube.transform.Rotate(Vector3.back, CutDirectionButton.GetAngle(cutDirection).Value);
         arrowCube.transform.SetParent(GameObject.FindGameObjectWithTag("3DCanvas").transform, false);
 
+        arrowCube.SetActive(false);
         note.arrowCube = arrowCube;
         note.gameObject.SetActive(active);
 

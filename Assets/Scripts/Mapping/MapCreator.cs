@@ -172,7 +172,6 @@ public class MapCreator : MonoBehaviour
             UpdateInputFieldsToDefault();
             return;
         }
-
         inputSongName.text = _MapInfo.songName;
         inputSongSubname.text = _MapInfo.songSubName;
         inputAuthorName.text = _MapInfo.authorName;
@@ -184,6 +183,7 @@ public class MapCreator : MonoBehaviour
             dropdownDifficulty.value = dropdownDifficulty.options.IndexOf(dropdownDifficulty.options.Where(x => x.text == _MapInfo.currentDifficulty.difficulty).FirstOrDefault());
             inputStartOffset.text = _MapInfo.currentDifficulty.offset.ToString();
             txtAudioFilename.text = Filebrowser.audio.HasSelectedFile ? Filebrowser.audio.FileName : _MapInfo.currentDifficulty.audioPath;
+            _MapInfo.currentDifficulty.audioPath = txtAudioFilename.text;
             inputNoteJumpSpeed.text = _Map != null ? _Map._noteJumpSpeed.ToString() : defaultNJS.ToString();
         }
         else

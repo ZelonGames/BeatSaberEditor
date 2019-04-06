@@ -24,7 +24,7 @@ public class MusicPlayer : MonoBehaviour
 
     private IEnumerator LoadAudio()
     {
-        var www = new WWW("file://" + MapCreator.Instance.MapFolderPath(MapCreator._MapInfo.songName) + "/song.ogg");
+        var www = new WWW("file://" + MapCreator.Instance.MapFolderPath(MapCreator._MapInfo.songName) + "/" + MapCreator._MapInfo.currentDifficulty.audioPath);
         audioSource.clip = www.GetAudioClip();
         audioSource.clip.name = "song.ogg";
         yield return www;
