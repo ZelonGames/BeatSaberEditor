@@ -123,7 +123,7 @@ public class Filebrowser : MonoBehaviour
         }
         CreateCustomSongsPath();
 
-        currentPath = browseCustomSongs ? CustomSongsPath : "/";
+        currentPath = browseCustomSongs ? CustomSongsPath : Environment.GetFolderPath(Environment.SpecialFolder.Personal);
         paths.Add(currentPath);
         canvasRect = canvas.GetComponent<RectTransform>().rect;
         scrollViewRect = scrollViewContent.GetComponent<RectTransform>().rect;
