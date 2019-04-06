@@ -194,6 +194,14 @@ public class _3DGridGenerator : MonoBehaviour
             Size = size;
         }
 
+        public void Destroy()
+        {
+            _HorizontalLines.ForEach(x => { GameObject.Destroy(x.Line); GameObject.Destroy(x.BeatText); });
+            _HorizontalLines.Clear();
+            VerticalLines.ForEach(x => GameObject.Destroy(x));
+            VerticalLines.Clear();
+        }
+
         public void Move(int beat)
         {
             int beatText = beat;
@@ -238,6 +246,12 @@ public class _3DGridGenerator : MonoBehaviour
 
         private void Generate(int renderDistance, int startBeat = 0)
         {
+            if (BeatGrids != null)
+            {
+                foreach (var beatGrid in BeatGrids)
+                    beatGrid.Value.Destroy();
+            }
+
             BeatGrids = new SortedList<double, BeatGrid>();
 
             if (startBeat < 0)

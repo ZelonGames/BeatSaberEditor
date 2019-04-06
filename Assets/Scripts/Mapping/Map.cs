@@ -119,6 +119,19 @@ public class Map
         return note;
     }
 
+    public SortedList<double, List<Note>> GetNotesBetween(double startBeat, double endBeat)
+    {
+        var foundNotes = new SortedList<double, List<Note>>();
+
+        foreach (var notes in NotesOnSameTime)
+        {
+            if (notes.Key >= startBeat && notes.Key <= endBeat)
+                foundNotes.Add(notes.Key, notes.Value);
+        }
+
+        return foundNotes;
+    }
+
     public Note GetNote(double time, int cutDirection)
     {
         return NotesOnSameTime[time].Where(x => x._cutDirection == cutDirection).FirstOrDefault();
