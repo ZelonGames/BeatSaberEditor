@@ -24,13 +24,13 @@ public class Map
 
     #region Properties
 
-    public List<double> timeStamps = new List<double>();
+    public List<float> timeStamps = new List<float>();
 
     [JsonIgnore]
-    public SortedList<double, List<Note>> NotesOnSameTime { get; private set; }
+    public SortedList<float, List<Note>> NotesOnSameTime { get; private set; }
 
     [JsonIgnore]
-    public double BeatLenghtInSeconds => 60d / _beatsPerMinute;
+    public float BeatLenghtInSeconds => 60f / _beatsPerMinute;
 
     [JsonIgnore]
     public bool IsLoaded { get; private set; }
@@ -41,7 +41,7 @@ public class Map
 
     public Map()
     {
-        NotesOnSameTime = new SortedList<double, List<Note>>();
+        NotesOnSameTime = new SortedList<float, List<Note>>();
         this._events = new List<JsonEvent>();
         this._notes = new List<JsonNote>();
 
@@ -103,7 +103,7 @@ public class Map
         IsLoaded = false;
     }
 
-    public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, double time, Note.ItemType type, bool active = false)
+    public Note AddNote(Note notePrefab, GameObject bombSpherePrefab, GameObject blueCubePrefab, GameObject redCubePrefab, Note.CutDirection cutDirection, Vector2Int coordinate, float time, Note.ItemType type, bool active = false)
     {
         time -= GetMSInBeats(MapCreator._Map._beatsPerMinute, MapCreator._MapInfo.currentDifficulty.oldOffset);
 
@@ -119,35 +119,32 @@ public class Map
         return note;
     }
 
-    public SortedList<double, List<Note>> GetNotesBetween(double startBeat, double endBeat)
+    public SortedList<float, List<Note>> GetNotesBetween(float startBeat, float endBeat)
     {
-        var foundNotes = new SortedList<double, List<Note>>();
+        var foundNotes = new SortedList<float, List<Note>>();
 
         foreach (var notes in NotesOnSameTime)
         {
             if (notes.Key >= startBeat && notes.Key <= endBeat)
                 foundNotes.Add(notes.Key, notes.Value);
+            if (notes.Key > endBeat)
+                break;
         }
 
         return foundNotes;
     }
 
-    public Note GetNote(double time, int cutDirection)
+    public Note GetNote(float time, int cutDirection)
     {
         return NotesOnSameTime[time].Where(x => x._cutDirection == cutDirection).FirstOrDefault();
     }
 
-    public static double GetBeatTime(double bpm, double ms, double _time)
-    {
-        return GetMSInBeats(bpm, ms) + _time;
-    }
-
-    public static double GetMSInBeats(double bpm, double ms)
+    public static float GetMSInBeats(float bpm, float ms)
     {
         return (bpm / 60000) * ms;
     }
 
-    public double GetAmountOfBeatsInSong()
+    public float GetAmountOfBeatsInSong()
     {
         return MusicPlayer.Instance.MusicLengthInSeconds() / BeatLenghtInSeconds;
     }
@@ -163,7 +160,7 @@ public class Map
             if (notes.Count == 0)
                 continue;
 
-            double noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
+            float noteTime = MapCreator._Map.BeatLenghtInSeconds * notes.First()._time;
             timeStamps.Add(noteTime);
         }
     }

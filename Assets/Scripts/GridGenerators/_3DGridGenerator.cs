@@ -23,7 +23,7 @@ public class _3DGridGenerator : MonoBehaviour
     private Rect smallLineRect;
 
     public readonly int startYPos = -500;
-    public readonly int distance = 80;
+    public readonly int distance = 150;
 
     private bool hasGeneratedGrid = false;
 
@@ -31,7 +31,7 @@ public class _3DGridGenerator : MonoBehaviour
 
     #region Properties
 
-    public Grid _3DGrid { get; private set; }
+    public Grid _Grid { get; private set; }
 
     public GameObject LastLine { get; private set; }
 
@@ -56,7 +56,7 @@ public class _3DGridGenerator : MonoBehaviour
     {
         if (MusicPlayer.Instance.IsLoaded && !hasGeneratedGrid)
         {
-            _3DGrid = new Grid(10);
+            _Grid = new Grid(10);
             InstantiateTimeline();
             hasGeneratedGrid = true;
 

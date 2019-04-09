@@ -5,7 +5,7 @@ using System.Text;
 
 public static class Extensions
 {
-    public static double GetNearestRoundedDown(this double value, double nearest)
+    public static float GetNearestRoundedDown(this float value, float nearest)
     {
         return value - (value % nearest);
     }

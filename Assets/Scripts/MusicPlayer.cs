@@ -33,7 +33,7 @@ public class MusicPlayer : MonoBehaviour
     public void ToggleSong()
     {
         float offsetTime = MapCreator._MapInfo.currentDifficulty.offset > 0 ? MapCreator._MapInfo.currentDifficulty.offset * 0.001f : 0;
-        audioSource.time = (float)MapEditorManager.Instance.NoteTimer + offsetTime;
+        audioSource.time = (float)MapEditorManager.Instance.CurrentTime + offsetTime;
 
         if (MapEditorManager.Instance.Playing)
             audioSource.Play();

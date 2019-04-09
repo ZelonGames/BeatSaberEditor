@@ -38,6 +38,7 @@ public class TimelineSlider : MonoBehaviour
     private TextMeshProUGUI txtTime;
 
     private bool hasSetMaxValue = false;
+    private bool shouldTriggerChangeTime = true;
 
     public static TimelineSlider Instance { get; private set; }
 
@@ -67,8 +68,9 @@ public class TimelineSlider : MonoBehaviour
     {
         if (!MapEditorManager.Instance.Playing)
         {
-            SnapSliderToPrecision(slider.value);
-            MapEditorManager.Instance.ChangeTime(slider.value);
+            if (shouldTriggerChangeTime)
+                MapEditorManager.Instance.ChangeTime(slider.value);
+            shouldTriggerChangeTime = true;
         }
 
         UpdateClockTime();
@@ -76,7 +78,8 @@ public class TimelineSlider : MonoBehaviour
 
     public void SnapSliderToPrecision(float beat)
     {
-        slider.value = (float)MapEditorManager.Instance.GetSnappedPrecisionBeatTime(beat, MapEditorManager.Instance.Precision);
+        slider.value = beat.GetNearestRoundedDown(1f / MapEditorManager.Instance.Precision);
+        shouldTriggerChangeTime = false;
     }
 
     private void UpdateClockTime()

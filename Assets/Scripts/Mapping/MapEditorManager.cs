@@ -17,12 +17,12 @@ public class MapEditorManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI txtBeatTime;
 
-    private SortedList<double, List<Note>> notesToShow = null;
+    private SortedList<float, List<Note>> notesToShow = null;
     private List<Note> nextNotesToShow = null;
 
     public readonly int maxPrecision = 64;
 
-    public delegate void UpdateNextAndPrevNote();
+    public static float minValue = 1f / 64;
 
     #endregion
 
@@ -31,9 +31,9 @@ public class MapEditorManager : MonoBehaviour
     public List<Note> ShowedNotes { get; set; }
     public Note.ItemType ItemType { get; private set; }
 
-    public double NoteTimer { get; private set; }
+    public float CurrentTime { get; private set; }
 
-    public double CurrentBeat => NoteTimer == 0 ? 0 : MapCreator._Map._beatsPerMinute * NoteTimer / 60f;
+    public float CurrentBeat => CurrentTime == 0 ? 0 : (MapCreator._Map._beatsPerMinute * CurrentTime) / 60f;
 
     public int Precision { get; private set; }
     public bool Playing { get; private set; }
@@ -55,10 +55,10 @@ public class MapEditorManager : MonoBehaviour
     {
         if (Playing)
         {
-            NoteTimer += Time.deltaTime;
+            CurrentTime += Time.deltaTime;
 
-            if (_3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat))
-                _3DGridGenerator.Instance._3DGrid.Update();
+            if (_3DGridGenerator.Instance._Grid.shouldUpdate(CurrentBeat))
+                _3DGridGenerator.Instance._Grid.Update();
 
             if (ShouldShowNotes(nextNotesToShow))
             {
@@ -76,7 +76,7 @@ public class MapEditorManager : MonoBehaviour
         if (Playing)
             return;
 
-        double jumpLength = 1d / Precision;
+        float jumpLength = 1f / Precision;
         ChangeTime(CurrentBeat + (forward ? jumpLength : -jumpLength), true);
     }
 
@@ -87,7 +87,7 @@ public class MapEditorManager : MonoBehaviour
         if (!Playing)
         {
             PlayTween.Instance.StopMoving();
-            ChangeTime(GetSnappedPrecisionBeatTime(CurrentBeat, Precision));
+            ChangeTime(CurrentBeat.GetNearestRoundedDown(1f / Precision));
         }
         else
             nextNotesToShow = GetClosestNotes();
@@ -114,7 +114,7 @@ public class MapEditorManager : MonoBehaviour
 
     public void UpdateNotesToShow()
     {
-        notesToShow = MapCreator._Map.GetNotesBetween(_3DGridGenerator.Instance._3DGrid.FirstBeatGrid.Beat, _3DGridGenerator.Instance._3DGrid.LastBeatGrid.Beat);
+        notesToShow = MapCreator._Map.GetNotesBetween(_3DGridGenerator.Instance._Grid.FirstBeatGrid.Beat, _3DGridGenerator.Instance._Grid.LastBeatGrid.Beat);
 
         foreach (var notes in notesToShow.Values)
             notes.ForEach(x => x.arrowCube.SetActive(true));
@@ -140,29 +140,30 @@ public class MapEditorManager : MonoBehaviour
             note.gameObject.SetActive(false);
     }
 
-    public void ChangeTime(double beat, bool manuallyChangingTime = false)
+    public void ChangeTime(float beat, bool manuallyChangingTime = false)
     {
         if (beat < 0)
             return;
 
         bool forward = beat > CurrentBeat;
-        int jumpDistance = Math.Abs((int)GetSnappedPrecisionBeatTime(beat, 1) - (int)GetSnappedPrecisionBeatTime(CurrentBeat, 1));
-        double prevNoteTimer = NoteTimer;
-        double beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
-        NoteTimer = beatLengthInSeconds * beat;
+        float prevNoteTimer = CurrentTime;
+        float beatLengthInSeconds = MapCreator._Map.BeatLenghtInSeconds;
 
-        TimelineSlider.Instance.SnapSliderToPrecision((float)beat);
-        PlayTween.Instance.Step((float)GetSnappedPrecisionBeatTime(beat, Precision));
-        
-        if (jumpDistance > 1 || _3DGridGenerator.Instance._3DGrid.shouldUpdate(CurrentBeat, forward))
-            _3DGridGenerator.Instance._3DGrid.Update(jumpDistance, forward);
+        int jumpDistance = Math.Abs((int)beat - (int)CurrentBeat);
+        CurrentTime = beatLengthInSeconds * beat;
+
+        if (jumpDistance > 1 || _3DGridGenerator.Instance._Grid.shouldUpdate(CurrentBeat, forward))
+            _3DGridGenerator.Instance._Grid.Update(jumpDistance, forward);
+
+        TimelineSlider.Instance.SnapSliderToPrecision(beat);
+        PlayTween.Instance.Step(beat);
 
         nextNotesToShow = GetClosestNotes();
 
         if (ShowedNotes != null)
             HideNotes(ShowedNotes);
 
-        if (ShouldShowNotes(nextNotesToShow, 1/64d, manuallyChangingTime))
+        if (ShouldShowNotes(nextNotesToShow, manuallyChangingTime))
             ShowNotes(nextNotesToShow);
     }
 
@@ -182,7 +183,7 @@ public class MapEditorManager : MonoBehaviour
 
         for (int i = 1; i < notesOnSameTime.Count; i++)
         {
-            double comparedTime = notesOnSameTime[i].First()._time;
+            float comparedTime = notesOnSameTime[i].First()._time;
 
             if (Math.Abs(comparedTime - currentTime) < Math.Abs(currentTime - closestNotes.First()._time))
                 closestNotes = notesOnSameTime[i];
@@ -193,7 +194,7 @@ public class MapEditorManager : MonoBehaviour
 
     private List<Note> GetNextNotes()
     {
-        SortedList<double, List<Note>> noteTimeChunkcs = MapCreator._Map.NotesOnSameTime;
+        SortedList<float, List<Note>> noteTimeChunkcs = MapCreator._Map.NotesOnSameTime;
         int nextIndex = noteTimeChunkcs.Values.IndexOf(ShowedNotes) + 1;
 
         if (nextIndex < noteTimeChunkcs.Count)
@@ -210,23 +211,16 @@ public class MapEditorManager : MonoBehaviour
 
         return null;
     }
-
-    public double GetSnappedPrecisionBeatTime(double beat, double precision)
-    {
-        double precisionValue = 1d / precision;
-        int multiplier = (int)(beat / precisionValue);
-
-        return multiplier / precision;
-    }
-
-    private bool ShouldShowNotes(List<Note> notes, double? precision = null, bool manuallyChangingTime = false)
+    
+    private bool ShouldShowNotes(List<Note> notes, bool manuallyChangingTime = false)
     {
         if (notes == null)
             return false;
 
-        double noteTime = nextNotesToShow.First()._time;
-        double roundedNoteTime = precision.HasValue ? noteTime.GetNearestRoundedDown(precision.Value) : noteTime;
-        return CurrentBeat >= roundedNoteTime && (manuallyChangingTime ? CurrentBeat - roundedNoteTime <= 1d / Precision / 2 : true);
+        Note note = notes.First();
+        float noteTime = note._time;
+
+        return manuallyChangingTime ? Math.Abs(CurrentBeat - noteTime) <= minValue : CurrentBeat >= noteTime;
     }
 
     #endregion

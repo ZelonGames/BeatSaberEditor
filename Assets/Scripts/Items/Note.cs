@@ -34,7 +34,7 @@ public class Note : MonoBehaviour
     }
 
     [HideInInspector]
-    public double _time;
+    public float _time;
     [HideInInspector]
     public int _lineIndex;
     [HideInInspector]
@@ -46,7 +46,7 @@ public class Note : MonoBehaviour
 
     public void Set(double _time, int _lineIndex, int _lineLayer, ItemType _type, CutDirection _cutDirection)
     {
-        this._time = _time;
+        this._time = (float)_time;
         this._lineIndex = _lineIndex;
         this._lineLayer = _lineLayer;
         this._type = (int)_type;
@@ -118,13 +118,13 @@ public class Note : MonoBehaviour
 
 public class JsonNote
 {
-    public double _time;
+    public float _time;
     public double _lineIndex;
     public double _lineLayer;
     public int _type;
     public int _cutDirection;
 
-    public JsonNote(double _time, double _lineIndex, double _lineLayer, Note.ItemType _type, Note.CutDirection _cutDirection)
+    public JsonNote(float _time, double _lineIndex, double _lineLayer, Note.ItemType _type, Note.CutDirection _cutDirection)
     {
         this._time = _time;
         this._lineIndex = _lineIndex;
