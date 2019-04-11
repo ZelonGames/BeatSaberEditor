@@ -77,7 +77,9 @@ public class MapEditorManager : MonoBehaviour
             return;
 
         float jumpLength = 1f / Precision;
-        ChangeTime(CurrentBeat + (forward ? jumpLength : -jumpLength), true);
+        float beat = CurrentBeat + (forward ? jumpLength : -jumpLength);
+        ChangeTime(beat, true);
+        TimelineSlider.Instance.SnapSliderToPrecision(beat, false);
     }
 
     public void OnPlay()
@@ -153,9 +155,8 @@ public class MapEditorManager : MonoBehaviour
         CurrentTime = beatLengthInSeconds * beat;
 
         if (jumpDistance > 1 || _3DGridGenerator.Instance._Grid.shouldUpdate(CurrentBeat, forward))
-            _3DGridGenerator.Instance._Grid.Update(jumpDistance, forward);
+            _3DGridGenerator.Instance._Grid.Update((int)beat);
 
-        TimelineSlider.Instance.SnapSliderToPrecision(beat);
         PlayTween.Instance.Step(beat);
 
         nextNotesToShow = GetClosestNotes();

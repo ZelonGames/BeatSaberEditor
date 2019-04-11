@@ -28,6 +28,9 @@ public class Map
 
     [JsonIgnore]
     public SortedList<float, List<Note>> NotesOnSameTime { get; private set; }
+    [JsonIgnore]
+    public SortedList<float, List<Note>> NoteChunks { get; private set; }
+    public float ChunkBeatSize => 1;
 
     [JsonIgnore]
     public float BeatLenghtInSeconds => 60f / _beatsPerMinute;
@@ -42,6 +45,7 @@ public class Map
     public Map()
     {
         NotesOnSameTime = new SortedList<float, List<Note>>();
+        NoteChunks = new SortedList<float, List<Note>>();
         this._events = new List<JsonEvent>();
         this._notes = new List<JsonNote>();
 
@@ -116,7 +120,18 @@ public class Map
         if (timeStamps.IndexOf(BeatLenghtInSeconds * note._time) < 0)
             timeStamps.Add(BeatLenghtInSeconds * note._time);
 
+        float chunkTime = time.GetNearestRoundedDown(ChunkBeatSize);
+        if (!NoteChunks.ContainsKey(chunkTime))
+            NoteChunks.Add(chunkTime, new List<Note>());
+
+        NoteChunks[chunkTime].Add(note);
+
         return note;
+    }
+
+    public List<Note> GetCurrentChunk(float currentBeat)
+    {
+        return NoteChunks[currentBeat.GetNearestRoundedDown(ChunkBeatSize)];
     }
 
     public SortedList<float, List<Note>> GetNotesBetween(float startBeat, float endBeat)

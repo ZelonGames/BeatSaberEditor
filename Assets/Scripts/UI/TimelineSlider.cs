@@ -38,7 +38,7 @@ public class TimelineSlider : MonoBehaviour
     private TextMeshProUGUI txtTime;
 
     private bool hasSetMaxValue = false;
-    private bool shouldTriggerChangeTime = true;
+    private bool shouldTriggerOnValueChanged = true;
 
     public static TimelineSlider Instance { get; private set; }
 
@@ -56,30 +56,32 @@ public class TimelineSlider : MonoBehaviour
     {
         if (MusicPlayer.Instance.IsLoaded && !hasSetMaxValue)
         {
-            slider.maxValue = (float)MapCreator._Map.GetAmountOfBeatsInSong();
+            slider.maxValue = MapCreator._Map.GetAmountOfBeatsInSong();
             hasSetMaxValue = true;
         }
 
         if (hasSetMaxValue && MapEditorManager.Instance.Playing)
-            slider.value = (float)MapEditorManager.Instance.CurrentBeat;
+            slider.value = MapEditorManager.Instance.CurrentBeat;
     }
 
     public void OnValueChanged()
     {
-        if (!MapEditorManager.Instance.Playing)
+        if (!shouldTriggerOnValueChanged)
         {
-            if (shouldTriggerChangeTime)
-                MapEditorManager.Instance.ChangeTime(slider.value);
-            shouldTriggerChangeTime = true;
+            shouldTriggerOnValueChanged = true;
+            return;
         }
+
+        if (!MapEditorManager.Instance.Playing)
+            MapEditorManager.Instance.ChangeTime((int)slider.value);
 
         UpdateClockTime();
     }
 
-    public void SnapSliderToPrecision(float beat)
+    public void SnapSliderToPrecision(float beat, bool shouldTriggerOnValueChanged)
     {
         slider.value = beat.GetNearestRoundedDown(1f / MapEditorManager.Instance.Precision);
-        shouldTriggerChangeTime = false;
+        this.shouldTriggerOnValueChanged = shouldTriggerOnValueChanged;
     }
 
     private void UpdateClockTime()

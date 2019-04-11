@@ -35,6 +35,8 @@ public class _3DGridGenerator : MonoBehaviour
 
     public GameObject LastLine { get; private set; }
 
+    public int RenderDistance => 5;
+
     public static _3DGridGenerator Instance { get; private set; }
 
     #endregion
@@ -56,7 +58,7 @@ public class _3DGridGenerator : MonoBehaviour
     {
         if (MusicPlayer.Instance.IsLoaded && !hasGeneratedGrid)
         {
-            _Grid = new Grid(10);
+            _Grid = new Grid(RenderDistance);
             InstantiateTimeline();
             hasGeneratedGrid = true;
 
@@ -238,12 +240,12 @@ public class _3DGridGenerator : MonoBehaviour
             Generate(renderDistance);
         }
 
-        public void Update(int jumpDistance = 0, bool forward = true)
+        public void Update(int? currentBeat = null)
         {
-            if (forward)
-                MoveBeatGrid(FirstBeatGrid.Beat, LastBeatGrid.Beat, jumpDistance);
+            if (currentBeat.HasValue)
+                Generate(RenderDistance, currentBeat.Value - 1);
             else
-                MoveBeatGrid(LastBeatGrid.Beat, FirstBeatGrid.Beat, jumpDistance);
+                MoveBeatGrid(LastBeatGrid.Beat, FirstBeatGrid.Beat);
         }
 
         private void Generate(int renderDistance, int startBeat = 0)
@@ -266,7 +268,7 @@ public class _3DGridGenerator : MonoBehaviour
             LastBeatGrid = BeatGrids[startBeat + renderDistance - 1];
         }
 
-        private void MoveBeatGrid(int from, int to, int jumpDistance)
+        private void MoveBeatGrid(int from, int to)
         {
             if (!BeatGrids.ContainsKey(from) || to <= 0)
                 return;
@@ -274,33 +276,23 @@ public class _3DGridGenerator : MonoBehaviour
             BeatGrid beatToMove = BeatGrids[from];
             if (from == FirstBeatGrid.Beat)
             {
-                if (jumpDistance > 1)
-                    Generate(RenderDistance, from + jumpDistance);
-                else
-                {
-                    FirstBeatGrid = BeatGrids[beatToMove.Beat + 1];
+                FirstBeatGrid = BeatGrids[beatToMove.Beat + 1];
 
-                    beatToMove.Move(to + 1);
-                    LastBeatGrid = beatToMove;
+                beatToMove.Move(to + 1);
+                LastBeatGrid = beatToMove;
 
-                    BeatGrids.Remove(from);
-                    BeatGrids.Add(to + 1, beatToMove);
-                }
+                BeatGrids.Remove(from);
+                BeatGrids.Add(to + 1, beatToMove);
             }
             else if (from == LastBeatGrid.Beat)
             {
-                if (jumpDistance > 1)
-                    Generate(RenderDistance, to - jumpDistance);
-                else
-                {
-                    beatToMove.Move(to - 1);
-                    BeatGrids.Remove(from);
+                beatToMove.Move(to - 1);
+                BeatGrids.Remove(from);
 
-                    BeatGrids.Add(to - 1, beatToMove);
+                BeatGrids.Add(to - 1, beatToMove);
 
-                    FirstBeatGrid = BeatGrids[to - 1];
-                    LastBeatGrid = BeatGrids[from - 1];
-                }
+                FirstBeatGrid = BeatGrids[to - 1];
+                LastBeatGrid = BeatGrids[from - 1];
             }
         }
 
