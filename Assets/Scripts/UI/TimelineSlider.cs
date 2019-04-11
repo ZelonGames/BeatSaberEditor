@@ -80,8 +80,8 @@ public class TimelineSlider : MonoBehaviour
 
     public void SnapSliderToPrecision(float beat, bool shouldTriggerOnValueChanged)
     {
-        slider.value = beat.GetNearestRoundedDown(1f / MapEditorManager.Instance.Precision);
         this.shouldTriggerOnValueChanged = shouldTriggerOnValueChanged;
+        slider.value = beat.GetNearestRoundedDown(1f / MapEditorManager.Instance.Precision);
     }
 
     private void UpdateClockTime()
